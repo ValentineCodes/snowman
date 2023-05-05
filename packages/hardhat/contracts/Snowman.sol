@@ -10,6 +10,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "base64-sol/base64.sol";
 
 import {DataTypes} from "./libraries/types/DataTypes.sol";
+import {Metadata} from "./libraries/logic/Metadata.sol";
 import {ToColor} from "./libraries/helpers/ToColor.sol";
 import {TypeCast} from "./libraries/helpers/TypeCast.sol";
 
@@ -43,9 +44,9 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
 
   mapping(uint256 => DataTypes.Snowman) private s_attributes;
 
-  Accessory[] private s_accessories;
+  address[] private s_accessories;
   mapping(address => bool) private s_accessoriesAvailable;
-  mapping(address => mapping(uint256 => uint256)) private s_accessdoriesById;
+  mapping(address => mapping(uint256 => uint256)) private s_accessoriesById;
 
   constructor(address feeCollector) ERC721("Snowman", "Snowman") {
     s_feeCollector = feeCollector;
@@ -79,13 +80,24 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
   }
 
   function addAccessory(address accessory) public onlyOwner {
+    if (s_accessoriesAvailable[accessory]) revert Snowman__AcccessoryAlreadyExists();
     s_accessoriesAvailable[accessory] = true;
-    s_accessories.push(Accessory(accessory));
+    s_accessories.push(accessory);
   }
 
-  function tokenURI(uint256 tokenId) public view override returns (string memory) {}
+  function tokenURI(uint256 tokenId) public view override returns (string memory) {
+    if (!_exists(tokenId)) revert Snowman__NotMinted();
 
-  function renderTokenById(uint256 tokenId) public view returns (string memory) {}
+    DataTypes.Snowman memory snowman = s_attributes[tokenId];
+
+    return Metadata.tokenURI(s_accessories, s_accessoriesById, snowman, tokenId);
+  }
+
+  function renderTokenById(uint256 tokenId) public view returns (string memory) {
+    DataTypes.Snowman memory snowman = s_attributes[tokenId];
+
+    return Metadata.renderTokenById(s_accessories, s_accessoriesById, snowman, tokenId);
+  }
 
   function onERC721Received(
     address operator,
@@ -97,9 +109,9 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
 
     if (ownerOf(snowmanId) != from) revert Snowman__NotAccessoryOwner();
     if (s_accessoriesAvailable[msg.sender] == false) revert Snowman__CannotWearAccessory();
-    if (s_accessdoriesById[msg.sender][snowmanId] > 0) revert Snowman__AccessoryAlreadyWorn();
+    if (s_accessoriesById[msg.sender][snowmanId] > 0) revert Snowman__AccessoryAlreadyWorn();
 
-    s_accessdoriesById[msg.sender][snowmanId] = tokenId;
+    s_accessoriesById[msg.sender][snowmanId] = tokenId;
 
     return this.onERC721Received.selector;
   }
@@ -122,7 +134,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     return s_attributes[tokenId];
   }
 
-  function getAccessories() public view returns (Accessory[] memory) {
+  function getAccessories() public view returns (address[] memory) {
     return s_accessories;
   }
 
