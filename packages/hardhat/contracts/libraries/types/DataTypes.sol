@@ -17,4 +17,8 @@ library DataTypes {
     bytes3 cloudColor;
     bytes3 buttonColor;
   }
+
+  struct Hat {
+    bytes3 color;
+  }
 }
