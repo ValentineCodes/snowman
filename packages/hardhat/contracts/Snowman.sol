@@ -20,7 +20,10 @@ error Snowman__InvalidFeeCollector();
 error Snowman__AcccessoryAlreadyExists();
 error Snowman__CannotWearAccessory();
 error Snowman__AccessoryAlreadyWorn();
+error Snowman__AccessoryNotWorn();
 error Snowman__NotAccessoryOwner();
+error Snowman__NotOwner();
+error Snowman__UnavailableAccessory();
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);
@@ -42,6 +45,8 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
 
   address[] private s_accessories;
   mapping(address => bool) private s_accessoriesAvailable;
+
+  // accessory address > snowman id > accessory id
   mapping(address => mapping(uint256 => uint256)) private s_accessoriesById;
 
   constructor(address feeCollector) ERC721("Snowman", "Snowman") {
@@ -83,6 +88,44 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     if (s_accessoriesAvailable[accessory]) revert Snowman__AcccessoryAlreadyExists();
     s_accessoriesAvailable[accessory] = true;
     s_accessories.push(accessory);
+  }
+
+  function removeAccessory(address accessory, uint256 snowmanId) public {
+    if (ownerOf(snowmanId) != msg.sender) revert Snowman__NotOwner();
+    if (!hasAccessory(accessory, snowmanId)) revert Snowman__AccessoryNotWorn();
+
+    _removeAccessory(accessory, snowmanId);
+  }
+
+  function removeAllAccessories(uint256 snowmanId) public {
+    if (msg.sender != ownerOf(snowmanId)) revert Snowman__NotAccessoryOwner();
+
+    address[] memory accessories = s_accessories;
+
+    // remove all accessories from snowman
+    for (uint i = 0; i < accessories.length; i++) {
+      if (s_accessoriesById[accessories[i]][snowmanId] > 0) {
+        _removeAccessory(accessories[i], snowmanId);
+      }
+    }
+  }
+
+  function _removeAccessory(address accessory, uint256 snowmanId) internal {
+    Accessory(accessory).transferFrom(address(this), ownerOf(snowmanId), s_accessoriesById[accessory][snowmanId]);
+
+    s_accessoriesById[accessory][snowmanId] = 0;
+  }
+
+  function hasAccessory(address accessory, uint256 snowmanId) public view returns (bool) {
+    if (!s_accessoriesAvailable[accessory]) revert Snowman__UnavailableAccessory();
+
+    return (s_accessoriesById[accessory][snowmanId] != 0);
+  }
+
+  function accessoryId(address accessory, uint256 snowmanId) external view returns (uint256) {
+    if (!s_accessoriesAvailable[accessory]) revert Snowman__UnavailableAccessory();
+
+    return s_accessoriesById[accessory][snowmanId];
   }
 
   function tokenURI(uint256 tokenId) public view override returns (string memory) {
