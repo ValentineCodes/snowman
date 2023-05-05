@@ -9,8 +9,8 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 
 import {DataTypes} from "../libraries/types/DataTypes.sol";
 import {ScarfMetadata} from "../libraries/logic/metadata/ScarfMetadata.sol";
-import {TypeCast} from "../libraries/helpers/TypeCast.sol";
-import {ColorGenerator} from "../libraries/helpers/ColorGenerator.sol";
+import {TypeCast} from "../libraries/utils/TypeCast.sol";
+import {ColorGenerator} from "../libraries/utils/ColorGenerator.sol";
 
 error Scarf__NotMinted();
 error Scarf__NotEnoughEth();

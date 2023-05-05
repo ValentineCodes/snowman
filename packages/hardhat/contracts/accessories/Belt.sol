@@ -9,8 +9,8 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 
 import {DataTypes} from "../libraries/types/DataTypes.sol";
 import {BeltMetadata} from "../libraries/logic/metadata/BeltMetadata.sol";
-import {TypeCast} from "../libraries/helpers/TypeCast.sol";
-import {ColorGenerator} from "../libraries/helpers/ColorGenerator.sol";
+import {TypeCast} from "../libraries/utils/TypeCast.sol";
+import {ColorGenerator} from "../libraries/utils/ColorGenerator.sol";
 
 error Belt__NotMinted();
 error Belt__NotEnoughEth();

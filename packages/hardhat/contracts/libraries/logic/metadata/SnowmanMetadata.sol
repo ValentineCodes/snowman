@@ -5,8 +5,8 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "base64-sol/base64.sol";
 
 import {DataTypes} from "../../types/DataTypes.sol";
-import {TokenURIGenerator} from "../../helpers/TokenURIGenerator.sol";
-import {TypeCast} from "../../helpers/TypeCast.sol";
+import {TokenURIGenerator} from "../../utils/TokenURIGenerator.sol";
+import {TypeCast} from "../../utils/TypeCast.sol";
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);

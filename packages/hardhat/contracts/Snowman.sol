@@ -9,7 +9,7 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 
 import {DataTypes} from "./libraries/types/DataTypes.sol";
 import {SnowmanMetadata} from "./libraries/logic/metadata/SnowmanMetadata.sol";
-import {TypeCast} from "./libraries/helpers/TypeCast.sol";
+import {TypeCast} from "./libraries/utils/TypeCast.sol";
 
 error Snowman__NotMinted();
 error Snowman__NotEnoughEth();
