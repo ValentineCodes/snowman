@@ -42,7 +42,7 @@ describe("Snowman☃️", () => {
   });
 
   describe("💬addAccessory", () => {
-    it("adds other nfts to the snowman for composition", async () => {
+    it("adds a hat to the snowman for composition", async () => {
       await snowman.mint({ value: SNOWMAN_MINT_FEE });
       console.log("Snowman minted✅");
 
