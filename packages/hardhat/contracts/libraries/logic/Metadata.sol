@@ -19,7 +19,7 @@ library Metadata {
   using ToColor for bytes3;
 
   function tokenURI(
-    address[] calldata accessories,
+    DataTypes.Accessory[] calldata accessories,
     mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
     DataTypes.Snowman calldata snowman,
     uint256 tokenId
@@ -50,10 +50,6 @@ library Metadata {
   }
 
   function renderSnowman(DataTypes.Snowman calldata snowman) internal pure returns (string memory) {
-    string memory cloud = string(
-      abi.encodePacked('<rect x="1" y="4" width="1433" height="1235" fill="#', snowman.cloudColor.toColor(), '" />')
-    );
-
     string
       memory snowfallBehind = '<circle cx="504.928" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="8.236s" fill="reset" repeatCount="indefinite" /></circle><circle cx="1250.77" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="3.982s" fill="reset" repeatCount="indefinite" /></circle><circle cx="205.714" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="4.249s" fill="reset" repeatCount="indefinite" /></circle><circle cx="329.535" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="7.113s" fill="reset" repeatCount="indefinite" /></circle><circle cx="167.398 " r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="3.5s" fill="reset" repeatCount="indefinite" /></circle><circle cx="1124.15" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="4.5s" fill="reset" repeatCount="indefinite" /></circle><circle cx="712.952" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="4.782s" fill="reset" repeatCount="indefinite" /></circle><circle cx="355.028" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="7.201s" fill="reset" repeatCount="indefinite" /></circle><circle cx="1204.46" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="5.289s" fill="reset" repeatCount="indefinite" /></circle><circle cx="596.703" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="4.892s" fill="reset" repeatCount="indefinite" /></circle><circle cx="1216.56" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="6.4s" fill="reset" repeatCount="indefinite" /></circle><circle cx="707.39" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="3.3s" fill="reset" repeatCount="indefinite" /></circle>';
     string
@@ -95,11 +91,11 @@ library Metadata {
       )
     );
 
-    return string(abi.encodePacked(cloud, snowfallBehind, snowyGround, face, middleBody, lowerBody, snowfallInFront));
+    return string(abi.encodePacked(snowfallBehind, snowyGround, face, middleBody, lowerBody, snowfallInFront));
   }
 
   function renderTokenById(
-    address[] calldata accessories,
+    DataTypes.Accessory[] calldata accessories,
     mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
     DataTypes.Snowman calldata snowman,
     uint256 tokenId
@@ -109,10 +105,15 @@ library Metadata {
     uint256 numOfAccessories = accessories.length;
 
     for (uint256 i = 0; i < numOfAccessories; i++) {
-      address accessory = accessories[i];
-      uint256 accessoryTokenId = s_accessoriesById[accessory][tokenId];
+      DataTypes.Accessory memory accessory = accessories[i];
+      uint256 accessoryTokenId = s_accessoriesById[accessory._address][tokenId];
+
       if (accessoryTokenId > 0) {
-        token = string(abi.encodePacked(token, Accessory(accessory).renderTokenById(accessoryTokenId)));
+        if (accessory.position == DataTypes.AccessoryPosition.Front) {
+          token = string(abi.encodePacked(token, Accessory(accessory._address).renderTokenById(accessoryTokenId)));
+        } else {
+          token = string(abi.encodePacked(Accessory(accessory._address).renderTokenById(accessoryTokenId), token));
+        }
       }
     }
 
@@ -120,7 +121,7 @@ library Metadata {
   }
 
   function generateSVG(
-    address[] calldata accessories,
+    DataTypes.Accessory[] calldata accessories,
     mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
     DataTypes.Snowman calldata snowman,
     uint256 tokenId
@@ -129,6 +130,9 @@ library Metadata {
       string(
         abi.encodePacked(
           '<svg width="100%" height="100%" viewBox="0 0 1453 1274" fill="none" xmlns="http://www.w3.org/2000/svg">',
+          '<rect x="1" y="4" width="1433" height="1235" fill="#',
+          snowman.cloudColor.toColor(),
+          '" />',
           renderTokenById(accessories, s_accessoriesById, snowman, tokenId),
           "</svg>"
         )

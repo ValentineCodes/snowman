@@ -43,7 +43,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
 
   mapping(uint256 => DataTypes.Snowman) private s_attributes;
 
-  address[] private s_accessories;
+  DataTypes.Accessory[] private s_accessories;
   mapping(address => bool) private s_accessoriesAvailable;
 
   // accessory address > snowman id > accessory id
@@ -84,10 +84,10 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     return tokenId;
   }
 
-  function addAccessory(address accessory) public onlyOwner {
+  function addAccessory(address accessory, DataTypes.AccessoryPosition position) public onlyOwner {
     if (s_accessoriesAvailable[accessory]) revert Snowman__AcccessoryAlreadyExists();
     s_accessoriesAvailable[accessory] = true;
-    s_accessories.push(accessory);
+    s_accessories.push(DataTypes.Accessory(accessory, position));
   }
 
   function removeAccessory(address accessory, uint256 snowmanId) public {
@@ -100,12 +100,12 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
   function removeAllAccessories(uint256 snowmanId) public {
     if (msg.sender != ownerOf(snowmanId)) revert Snowman__NotAccessoryOwner();
 
-    address[] memory accessories = s_accessories;
+    DataTypes.Accessory[] memory accessories = s_accessories;
 
     // remove all accessories from snowman
     for (uint i = 0; i < accessories.length; i++) {
-      if (s_accessoriesById[accessories[i]][snowmanId] > 0) {
-        _removeAccessory(accessories[i], snowmanId);
+      if (s_accessoriesById[accessories[i]._address][snowmanId] > 0) {
+        _removeAccessory(accessories[i]._address, snowmanId);
       }
     }
   }
@@ -177,7 +177,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     return s_attributes[tokenId];
   }
 
-  function getAccessories() public view returns (address[] memory) {
+  function getAccessories() public view returns (DataTypes.Accessory[] memory) {
     return s_accessories;
   }
 
