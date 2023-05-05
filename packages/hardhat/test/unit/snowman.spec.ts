@@ -29,21 +29,13 @@ describe("Snowman☃️", () => {
       console.log("Old Balance: ", ethers.utils.formatEther(oldFeeCollectorBalance), "💎");
       const MINT_FEE: BigNumber = ethers.utils.parseEther("0.02");
 
-      console.log("Minting One(1) Snowman...");
+      console.log("Minting One(1) Snowman☃️...");
       await snowman.mint({ value: MINT_FEE });
-
-      // const latestTokenIdMinted: BigNumber = await snowman.getTokenIds();
-      // const minter: string = await snowman.ownerOf(latestTokenIdMinted);
-      // expect(minter).to.equal(valentine.address);
-
-      // const tokenURI: string = await snowman.tokenURI(latestTokenIdMinted);
-      // expect(tokenURI.length).to.greaterThan(0);
+      console.log(`Successfully Minted One(1) Snowman☃️`);
 
       const newFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
       console.log("New Balance: ", ethers.utils.formatEther(newFeeCollectorBalance), "💎");
       expect(newFeeCollectorBalance).to.equal(oldFeeCollectorBalance.add(MINT_FEE));
-
-      console.log(`Successfully Minted One(1) Snowman☃️`);
     });
   });
 });
