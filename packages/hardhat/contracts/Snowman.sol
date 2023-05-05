@@ -57,14 +57,18 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     _mint(msg.sender, tokenId);
 
     DataTypes.Snowman memory snowman;
+    bytes3[2] memory colors;
 
-    // generate color
-    bytes32 randHash = keccak256(abi.encodePacked(blockhash(block.number - 1), msg.sender, address(this)));
-    snowman.cloudColor = bytes2(randHash[0]) | (bytes2(randHash[1]) >> 8) | (bytes3(randHash[2]) >> 16);
+    // generate random cloud and button color
+    for (uint256 i = 0; i < 2; i++) {
+      bytes32 randHash = keccak256(abi.encodePacked(i + 1, blockhash(block.number - 1), msg.sender, address(this)));
+      colors[i] = bytes2(randHash[0]) | (bytes2(randHash[1]) >> 8) | (bytes3(randHash[2]) >> 16);
+    }
 
-    // generate iris position
-    uint256 randNum = uint256(randHash) % 20;
-    snowman.irisPosition = randNum + 328;
+    // generate random perspective
+    uint256 randNum = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), msg.sender, address(this)))) % 20;
+
+    snowman = DataTypes.Snowman({perspective: randNum + 328, cloudColor: colors[0], buttonColor: colors[1]});
 
     s_attributes[tokenId] = snowman;
 

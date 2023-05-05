@@ -281,7 +281,7 @@ const contracts = {
                   components: [
                     {
                       internalType: "uint256",
-                      name: "irisPosition",
+                      name: "perspective",
                       type: "uint256",
                     },
                     {
