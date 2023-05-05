@@ -11,6 +11,7 @@ import {Base64} from "base64-sol/base64.sol";
 
 import {DataTypes} from "./libraries/types/DataTypes.sol";
 import {ToColor} from "./libraries/helpers/ToColor.sol";
+import {TypeCast} from "./libraries/helpers/TypeCast.sol";
 
 error Snowman__NotMinted();
 error Snowman__NotEnoughEth();
@@ -18,6 +19,9 @@ error Snowman__TransferFailed();
 error Snowman__ZeroAddress();
 error Snowman__InvalidFeeCollector();
 error Snowman__AcccessoryAlreadyExists();
+error Snowman__CannotWearAccessory();
+error Snowman__AccessoryAlreadyWorn();
+error Snowman__NotAccessoryOwner();
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);
@@ -28,6 +32,7 @@ abstract contract Accessory {
 contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
   using Strings for uint256;
   using ToColor for bytes3;
+  using TypeCast for bytes;
   using Counters for Counters.Counter;
 
   event FeeCollectorChanged(address oldFeeCollector, address newFeeCollector);
@@ -42,7 +47,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
   mapping(address => bool) private s_accessoriesAvailable;
   mapping(address => mapping(uint256 => uint256)) private s_accessdoriesById;
 
-  constructor(address feeCollector) ERC721("Snowman", "Snow") {
+  constructor(address feeCollector) ERC721("Snowman", "Snowman") {
     s_feeCollector = feeCollector;
   }
 
@@ -74,8 +79,6 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
   }
 
   function addAccessory(address accessory) public onlyOwner {
-    if (s_accessoriesAvailable[accessory]) revert Snowman__AcccessoryAlreadyExists();
-
     s_accessoriesAvailable[accessory] = true;
     s_accessories.push(Accessory(accessory));
   }
@@ -88,8 +91,18 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     address operator,
     address from,
     uint256 tokenId,
-    bytes calldata data
-  ) external override returns (bytes4) {}
+    bytes calldata snowmanIdData
+  ) external override returns (bytes4) {
+    uint256 snowmanId = snowmanIdData.toUint256();
+
+    if (ownerOf(snowmanId) != from) revert Snowman__NotAccessoryOwner();
+    if (s_accessoriesAvailable[msg.sender] == false) revert Snowman__CannotWearAccessory();
+    if (s_accessdoriesById[msg.sender][snowmanId] > 0) revert Snowman__AccessoryAlreadyWorn();
+
+    s_accessdoriesById[msg.sender][snowmanId] = tokenId;
+
+    return this.onERC721Received.selector;
+  }
 
   function setFeeCollector(address newFeeCollector) public onlyOwner {
     address oldFeeCollector = s_feeCollector;
