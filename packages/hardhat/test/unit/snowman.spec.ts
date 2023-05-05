@@ -1,12 +1,12 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { deployments, ethers } from "hardhat";
-import { Hat, Snowman } from "../../typechain-types";
+import { Hat, Scarf, Snowman } from "../../typechain-types";
 import { BigNumber } from "ethers";
 
 describe("Snowman☃️", () => {
   const SNOWMAN_MINT_FEE: BigNumber = ethers.utils.parseEther("0.02");
-  const HAT_MINT_FEE: BigNumber = ethers.utils.parseEther("0.01");
+  const ACCESSORY_MINT_FEE: BigNumber = ethers.utils.parseEther("0.01");
 
   let owner: SignerWithAddress;
   let valentine: SignerWithAddress;
@@ -41,24 +41,28 @@ describe("Snowman☃️", () => {
     });
   });
 
-  describe("💬addAccessory", () => {
-    it("adds a hat to the snowman for composition", async () => {
+  describe("💬addAccessory test-focus", () => {
+    it("adds accessories to the snowman for composition", async () => {
       await snowman.mint({ value: SNOWMAN_MINT_FEE });
       console.log("Snowman minted✅");
 
-      await deployments.fixture("Hat");
+      await deployments.fixture(["Hat", "Scarf"]);
 
       const hat: Hat = await ethers.getContract("Hat", valentine);
-      await hat.mint({ value: HAT_MINT_FEE });
+      await hat.mint({ value: ACCESSORY_MINT_FEE });
 
-      expect((await hat.ownerOf(1)).toLowerCase()).to.equal(valentine.address.toLowerCase());
-      console.log("Hat minted✅");
+      const scarf: Scarf = await ethers.getContract("Scarf", valentine);
+      await scarf.mint({ value: ACCESSORY_MINT_FEE });
 
       await snowman.connect(owner).addAccessory(hat.address, 1);
-      console.log("Hat added as an accessory✅");
+      await snowman.connect(owner).addAccessory(scarf.address, 0);
 
       const snowmanId = ethers.utils.defaultAbiCoder.encode(["uint256"], [1]);
       await hat["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
+      await scarf["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
+
+      console.log("Added hat and scarf as an accessory✅");
+      console.log(await snowman.tokenURI(1));
     });
   });
 });

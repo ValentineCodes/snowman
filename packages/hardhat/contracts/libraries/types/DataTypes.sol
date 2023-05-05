@@ -21,4 +21,8 @@ library DataTypes {
   struct Hat {
     bytes3 color;
   }
+
+  struct Scarf {
+    bytes3 color;
+  }
 }

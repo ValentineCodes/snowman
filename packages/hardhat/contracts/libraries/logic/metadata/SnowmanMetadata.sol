@@ -24,7 +24,7 @@ library SnowmanMetadata {
     DataTypes.Snowman calldata snowman,
     uint256 tokenId
   ) external view returns (string memory) {
-    string memory name = string(abi.encodePacked("Snowman: #", tokenId.toString()));
+    string memory name = string(abi.encodePacked("Snowman#", tokenId.toString()));
     string memory description = "This is a snowman";
     string memory image = Base64.encode(bytes(generateSVG(accessories, s_accessoriesById, snowman, tokenId)));
 
