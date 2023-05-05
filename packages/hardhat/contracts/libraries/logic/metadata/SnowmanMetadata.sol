@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {Base64} from "base64-sol/base64.sol";
-import {console} from "hardhat/console.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
-import {ToColor} from "../helpers/ToColor.sol";
+import {Base64} from "base64-sol/base64.sol";
 
-import {DataTypes} from "../types/DataTypes.sol";
+import {DataTypes} from "../../types/DataTypes.sol";
+import {TokenURIGenerator} from "../../helpers/TokenURIGenerator.sol";
+import {TypeCast} from "../../helpers/TypeCast.sol";
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);
@@ -14,9 +14,9 @@ abstract contract Accessory {
   function transferFrom(address from, address to, uint256 id) external virtual;
 }
 
-library Metadata {
+library SnowmanMetadata {
   using Strings for uint256;
-  using ToColor for bytes3;
+  using TypeCast for bytes3;
 
   function tokenURI(
     DataTypes.Accessory[] calldata accessories,
@@ -28,25 +28,7 @@ library Metadata {
     string memory description = "This is a snowman";
     string memory image = Base64.encode(bytes(generateSVG(accessories, s_accessoriesById, snowman, tokenId)));
 
-    return
-      string(
-        abi.encodePacked(
-          "data:applicaton/json;base64,",
-          Base64.encode(
-            bytes(
-              abi.encodePacked(
-                '{"name": "',
-                name,
-                '", "description": "',
-                description,
-                '", "image": "data:image/svg+xml;base64,',
-                image,
-                '"}'
-              )
-            )
-          )
-        )
-      );
+    return TokenURIGenerator.generateSVGTokenURI(name, description, image);
   }
 
   function renderSnowman(DataTypes.Snowman calldata snowman) internal pure returns (string memory) {

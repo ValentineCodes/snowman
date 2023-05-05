@@ -21,8 +21,16 @@ const deploySnowman: DeployFunction = async function (hre: HardhatRuntimeEnviron
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  const metadata = await deploy("Metadata", {
+  // Deploy libraries
+  const tokenURIGenerator = await deploy("TokenURIGenerator", {
     from: deployer,
+  });
+
+  const snowmanMetadata = await deploy("SnowmanMetadata", {
+    from: deployer,
+    libraries: {
+      TokenURIGenerator: tokenURIGenerator.address,
+    },
   });
 
   await deploy("Snowman", {
@@ -30,7 +38,7 @@ const deploySnowman: DeployFunction = async function (hre: HardhatRuntimeEnviron
     args: [deployer],
     log: true,
     libraries: {
-      Metadata: metadata.address,
+      SnowmanMetadata: snowmanMetadata.address,
     },
     // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
     // automatically mining the contract deployment transaction. There is no effect on live networks.

@@ -9,7 +9,7 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 import {Base64} from "base64-sol/base64.sol";
 
 import {DataTypes} from "./libraries/types/DataTypes.sol";
-import {Metadata} from "./libraries/logic/Metadata.sol";
+import {SnowmanMetadata} from "./libraries/logic/metadata/SnowmanMetadata.sol";
 import {TypeCast} from "./libraries/helpers/TypeCast.sol";
 
 error Snowman__NotMinted();
@@ -133,13 +133,13 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
 
     DataTypes.Snowman memory snowman = s_attributes[tokenId];
 
-    return Metadata.tokenURI(s_accessories, s_accessoriesById, snowman, tokenId);
+    return SnowmanMetadata.tokenURI(s_accessories, s_accessoriesById, snowman, tokenId);
   }
 
   function renderTokenById(uint256 tokenId) public view returns (string memory) {
     DataTypes.Snowman memory snowman = s_attributes[tokenId];
 
-    return Metadata.renderTokenById(s_accessories, s_accessoriesById, snowman, tokenId);
+    return SnowmanMetadata.renderTokenById(s_accessories, s_accessoriesById, snowman, tokenId);
   }
 
   function onERC721Received(

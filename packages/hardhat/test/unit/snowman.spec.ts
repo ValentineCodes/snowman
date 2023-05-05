@@ -32,6 +32,9 @@ describe("Snowman☃️", () => {
       console.log("Minting One(1) Snowman...");
       await snowman.mint({ value: MINT_FEE });
 
+      const tokenURI: string = await snowman.tokenURI(1);
+      console.log(tokenURI);
+
       // const latestTokenIdMinted: BigNumber = await snowman.getTokenIds();
       // const minter: string = await snowman.ownerOf(latestTokenIdMinted);
       // expect(minter).to.equal(valentine.address);
