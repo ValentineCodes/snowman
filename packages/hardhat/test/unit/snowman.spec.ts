@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { deployments, ethers } from "hardhat";
-import { Hat, Scarf, Snowman } from "../../typechain-types";
+import { Belt, Hat, Scarf, Snowman } from "../../typechain-types";
 import { BigNumber } from "ethers";
 
 describe("Snowman☃️", () => {
@@ -46,7 +46,8 @@ describe("Snowman☃️", () => {
       await snowman.mint({ value: SNOWMAN_MINT_FEE });
       console.log("Snowman minted✅");
 
-      await deployments.fixture(["Hat", "Scarf"]);
+      // deploy accessories
+      await deployments.fixture(["Hat", "Scarf", "Belt"]);
 
       const hat: Hat = await ethers.getContract("Hat", valentine);
       await hat.mint({ value: ACCESSORY_MINT_FEE });
@@ -54,12 +55,17 @@ describe("Snowman☃️", () => {
       const scarf: Scarf = await ethers.getContract("Scarf", valentine);
       await scarf.mint({ value: ACCESSORY_MINT_FEE });
 
+      const belt: Belt = await ethers.getContract("Belt", valentine);
+      await belt.mint({ value: ACCESSORY_MINT_FEE });
+
       await snowman.connect(owner).addAccessory(hat.address, 1);
       await snowman.connect(owner).addAccessory(scarf.address, 0);
+      await snowman.connect(owner).addAccessory(belt.address, 0);
 
       const snowmanId = ethers.utils.defaultAbiCoder.encode(["uint256"], [1]);
       await hat["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
       await scarf["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
+      await belt["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
 
       console.log("Added hat and scarf as an accessory✅");
       console.log(await snowman.tokenURI(1));

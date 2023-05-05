@@ -25,4 +25,8 @@ library DataTypes {
   struct Scarf {
     bytes3 color;
   }
+
+  struct Belt {
+    bytes3 color;
+  }
 }

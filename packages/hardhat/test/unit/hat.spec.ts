@@ -24,7 +24,7 @@ describe("Hat🎩", () => {
   });
 
   describe("💬mint", () => {
-    it("mints one(1) Hat🎩 with unique attributes for 0.02 ETH💎", async () => {
+    it("mints one(1) Hat🎩 with unique attributes for 0.01 ETH💎", async () => {
       // Mint Hat
       const feeCollector: string = await hat.getFeeCollector();
       const oldFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
