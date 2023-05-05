@@ -6,12 +6,10 @@ import {ERC721Enumerable, ERC721} from "@openzeppelin/contracts/token/ERC721/ext
 import {IERC721Receiver} from "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "base64-sol/base64.sol";
 
 import {DataTypes} from "./libraries/types/DataTypes.sol";
 import {Metadata} from "./libraries/logic/Metadata.sol";
-import {ToColor} from "./libraries/helpers/ToColor.sol";
 import {TypeCast} from "./libraries/helpers/TypeCast.sol";
 
 error Snowman__NotMinted();
@@ -31,8 +29,6 @@ abstract contract Accessory {
 }
 
 contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
-  using Strings for uint256;
-  using ToColor for bytes3;
   using TypeCast for bytes;
   using Counters for Counters.Counter;
 
