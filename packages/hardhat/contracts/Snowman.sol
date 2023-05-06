@@ -3,9 +3,11 @@
 pragma solidity ^0.8.17;
 
 import {ERC721Enumerable, ERC721} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import {IERC721Receiver} from "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
+
+import {ISnowman} from "./interfaces/ISnowman.sol";
+import {IERC721Receiver} from "./interfaces/IERC721Receiver.sol";
 
 import {DataTypes} from "./libraries/types/DataTypes.sol";
 import {SnowmanMetadata} from "./libraries/logic/metadata/SnowmanMetadata.sol";
@@ -33,11 +35,12 @@ abstract contract Accessory {
 }
 
 /**
- * @title Snowman - ERC4883 Composable Snowman NFT
+ * @title Snowman⛄️ - ERC4883 Composable Snowman NFT
  * @author Valentine Orga
  * @notice Mint snowman and compose with other accessories(other NFTs) approved by the admin.
+ *         Compose snowman by placing items in the foreground or background of your snowman.☃️
  */
-contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
+contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
   using TypeCast for bytes;
   using Counters for Counters.Counter;
 
@@ -130,7 +133,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     return s_accessoriesById[accessory][snowmanId];
   }
 
-  function tokenURI(uint256 tokenId) public view override returns (string memory) {
+  function tokenURI(uint256 tokenId) public view override(ERC721, ISnowman) returns (string memory) {
     if (!_exists(tokenId)) revert Snowman__NotMinted();
 
     DataTypes.Snowman memory snowman = s_attributes[tokenId];
@@ -155,7 +158,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     address from,
     uint256 tokenId,
     bytes calldata snowmanIdData
-  ) external override returns (bytes4) {
+  ) external returns (bytes4) {
     uint256 snowmanId = snowmanIdData.toUint256();
 
     if (ownerOf(snowmanId) != from) revert Snowman__NotAccessoryOwner();
