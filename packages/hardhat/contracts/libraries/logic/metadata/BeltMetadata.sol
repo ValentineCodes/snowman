@@ -30,7 +30,7 @@ library BeltMetadata {
       );
   }
 
-  function generateSVG(DataTypes.Belt calldata belt) internal pure returns (string memory) {
+  function generateSVG(DataTypes.Belt calldata belt) public pure returns (string memory) {
     return
       string(
         abi.encodePacked(

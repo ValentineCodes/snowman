@@ -44,7 +44,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
   event FeeCollectorChanged(address oldFeeCollector, address newFeeCollector);
 
   uint256 constant MINT_FEE = 0.02 ether;
-  address s_feeCollector;
+  address payable s_feeCollector;
   Counters.Counter private s_tokenIds;
 
   mapping(uint256 => DataTypes.Snowman) private s_attributes;
@@ -56,7 +56,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
   mapping(address => mapping(uint256 => uint256)) private s_accessoriesById;
 
   constructor(address feeCollector) ERC721("Snowman", "Snowman") {
-    s_feeCollector = feeCollector;
+    s_feeCollector = payable(feeCollector);
   }
 
   function mint() public payable returns (uint256) {
@@ -79,7 +79,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
 
     s_attributes[tokenId] = snowman;
 
-    (bool success, ) = payable(owner()).call{value: msg.value}("");
+    (bool success, ) = s_feeCollector.call{value: msg.value}("");
 
     if (!success) revert Snowman__TransferFailed();
 
@@ -138,6 +138,12 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     return SnowmanMetadata.tokenURI(s_accessories, s_accessoriesById, snowman, tokenId);
   }
 
+  function generateSVG(uint256 tokenId) public view returns (string memory) {
+    if (!_exists(tokenId)) revert Snowman__NotMinted();
+
+    return SnowmanMetadata.generateSVG(s_accessories, s_accessoriesById, s_attributes[tokenId], tokenId);
+  }
+
   function renderTokenById(uint256 tokenId) public view returns (string memory) {
     DataTypes.Snowman memory snowman = s_attributes[tokenId];
 
@@ -166,7 +172,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     if (newFeeCollector == address(0)) revert Snowman__ZeroAddress();
     if (newFeeCollector == oldFeeCollector) revert Snowman__InvalidFeeCollector();
 
-    s_feeCollector = newFeeCollector;
+    s_feeCollector = payable(newFeeCollector);
 
     emit FeeCollectorChanged(oldFeeCollector, newFeeCollector);
   }

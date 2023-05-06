@@ -56,15 +56,17 @@ contract Hat is ERC721, Ownable {
   function tokenURI(uint256 tokenId) public view override returns (string memory) {
     if (!_exists(tokenId)) revert Hat__NotMinted();
 
-    DataTypes.Hat memory hat = s_attributes[tokenId];
+    return HatMetadata.tokenURI(s_attributes[tokenId], tokenId);
+  }
 
-    return HatMetadata.tokenURI(hat, tokenId);
+  function generateSVG(uint256 tokenId) public view returns (string memory) {
+    if (!_exists(tokenId)) revert Hat__NotMinted();
+
+    return HatMetadata.generateSVG(s_attributes[tokenId]);
   }
 
   function renderTokenById(uint256 tokenId) public view returns (string memory) {
-    DataTypes.Hat memory hat = s_attributes[tokenId];
-
-    return HatMetadata.renderTokenById(hat);
+    return HatMetadata.renderTokenById(s_attributes[tokenId]);
   }
 
   function setFeeCollector(address newFeeCollector) public onlyOwner {

@@ -68,10 +68,8 @@ describe("Snowman☃️", () => {
       await belt["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
       console.log("Added hat and scarf as an accessory✅");
 
-      const tokenURI = await (await fetch(await snowman.tokenURI(1))).json();
-      const image: string = await (await fetch(tokenURI.image)).text();
-      tokenURI.image = image;
-      console.log(tokenURI);
+      const image = await snowman.generateSVG(1);
+      console.log(image);
     });
   });
 });
