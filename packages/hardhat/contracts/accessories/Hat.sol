@@ -44,7 +44,7 @@ contract Hat is ERC721, Ownable {
     _mint(msg.sender, tokenId);
 
     // generate random color
-    s_attributes[tokenId] = DataTypes.Hat({color: ColorGen.HEX()});
+    s_attributes[tokenId] = DataTypes.Hat({color: ColorGen.HSLA()});
 
     // transfer mint fee
     (bool success, ) = payable(owner()).call{value: msg.value}("");

@@ -67,7 +67,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
 
     // generate random cloud and button color
     for (uint256 i = 0; i < 2; i++) {
-      colors[i] = ColorGen.HEX(bytes32(i));
+      colors[i] = ColorGen.HSLA(bytes32(i));
     }
 
     snowman = DataTypes.Snowman({perspective: PRNG.range(328, 347), cloudColor: colors[0], buttonColor: colors[1]});

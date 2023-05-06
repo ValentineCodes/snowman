@@ -4,8 +4,6 @@ pragma solidity ^0.8.17;
 import {PRNG} from "./PRNG.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
-import {console} from "hardhat/console.sol";
-
 library ColorGen {
   using PRNG for uint256;
   using Strings for uint256;
@@ -45,8 +43,7 @@ library ColorGen {
     uint256[3] memory randNums;
 
     for (uint256 i = 0; i < 3; i++) {
-      bytes32 _seed = bytes32(abi.encodePacked(seed, i));
-      console.log(MIN_RGB_VALUE.range(MAX_RGB_VALUE, _seed));
+      bytes32 _seed = bytes32(keccak256(abi.encodePacked(seed, i)));
       randNums[i] = MIN_RGB_VALUE.range(MAX_RGB_VALUE, _seed);
     }
 
@@ -73,7 +70,7 @@ library ColorGen {
 
     //  rgb
     for (uint256 i = 0; i < 3; i++) {
-      bytes32 _seed = bytes32(abi.encodePacked(seed, i));
+      bytes32 _seed = bytes32(keccak256(abi.encodePacked(seed, i)));
       randNums[i] = MIN_RGB_VALUE.range(MAX_RGB_VALUE, _seed);
     }
     //  alpha
@@ -98,7 +95,7 @@ library ColorGen {
     uint256[3] memory randNums;
 
     for (uint256 i = 0; i < 3; i++) {
-      bytes32 _seed = bytes32(abi.encodePacked(seed, i));
+      bytes32 _seed = bytes32(keccak256(abi.encodePacked(seed, i)));
       randNums[i] = MIN_HSL_VALUE.range(MAX_HSL_VALUE, _seed);
     }
 
@@ -123,7 +120,7 @@ library ColorGen {
     uint256[4] memory randNums;
 
     for (uint256 i = 0; i < 3; i++) {
-      bytes32 _seed = bytes32(abi.encodePacked(seed, i));
+      bytes32 _seed = bytes32(keccak256(abi.encodePacked(seed, i)));
       randNums[i] = MIN_HSL_VALUE.range(MAX_HSL_VALUE, _seed);
     }
 
@@ -143,30 +140,32 @@ library ColorGen {
   }
 
   function _formatRGB(uint256 r, uint256 g, uint256 b) internal pure returns (string memory) {
-    return string(abi.encodePacked("rgb(", r.toString(), ",", g.toString(), ",", b.toString(), ")"));
+    return string(abi.encodePacked("rgb(", r.toString(), ", ", g.toString(), ", ", b.toString(), ")"));
   }
 
   function _formatRGBA(uint256 r, uint256 g, uint256 b, uint256 a) internal pure returns (string memory) {
     if (a < MAX_ALPHA) {
       return
-        string(abi.encodePacked("rgb(", r.toString(), ",", g.toString(), ",", b.toString(), ", 0.", a.toString(), ")"));
+        string(
+          abi.encodePacked("rgba(", r.toString(), ", ", g.toString(), ", ", b.toString(), ", 0.", a.toString(), ")")
+        );
     } else {
-      return string(abi.encodePacked("rgb(", r.toString(), ",", g.toString(), ",", b.toString(), ", 1)"));
+      return string(abi.encodePacked("rgba(", r.toString(), ", ", g.toString(), ", ", b.toString(), ", 1)"));
     }
   }
 
   function _formatHSL(uint256 h, uint256 s, uint256 l) internal pure returns (string memory) {
-    return string(abi.encodePacked("rgb(", h.toString(), ",", s.toString(), "%,", l.toString(), "%)"));
+    return string(abi.encodePacked("hsl(", h.toString(), ", ", s.toString(), "%, ", l.toString(), "%)"));
   }
 
   function _formatHSLA(uint256 h, uint256 s, uint256 l, uint256 a) internal pure returns (string memory) {
     if (a < MAX_ALPHA) {
       return
         string(
-          abi.encodePacked("hsl(", h.toString(), ",", s.toString(), "%,", l.toString(), "%, 0.", a.toString(), ")")
+          abi.encodePacked("hsla(", h.toString(), ", ", s.toString(), "%, ", l.toString(), "%, 0.", a.toString(), ")")
         );
     } else {
-      return string(abi.encodePacked("rgb(", h.toString(), ",", s.toString(), "%,", l.toString(), "%, 1)"));
+      return string(abi.encodePacked("hsla(", h.toString(), ", ", s.toString(), "%, ", l.toString(), "%, 1)"));
     }
   }
 }
