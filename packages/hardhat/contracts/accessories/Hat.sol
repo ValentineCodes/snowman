@@ -10,7 +10,7 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 import {DataTypes} from "../libraries/types/DataTypes.sol";
 import {HatMetadata} from "../libraries/logic/metadata/HatMetadata.sol";
 import {TypeCast} from "../libraries/utils/TypeCast.sol";
-import {ColorGenerator} from "../libraries/utils/ColorGenerator.sol";
+import {ColorGen} from "../libraries/utils/ColorGen.sol";
 
 error Hat__NotMinted();
 error Hat__NotEnoughEth();
@@ -44,7 +44,7 @@ contract Hat is ERC721, Ownable {
     _mint(msg.sender, tokenId);
 
     // generate random color
-    s_attributes[tokenId] = DataTypes.Hat({color: ColorGenerator.HEX()});
+    s_attributes[tokenId] = DataTypes.Hat({color: ColorGen.HEX()});
 
     // transfer mint fee
     (bool success, ) = payable(owner()).call{value: msg.value}("");

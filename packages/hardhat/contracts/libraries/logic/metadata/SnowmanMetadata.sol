@@ -5,7 +5,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "base64-sol/base64.sol";
 
 import {DataTypes} from "../../types/DataTypes.sol";
-import {TokenURIGenerator} from "../../utils/TokenURIGenerator.sol";
+import {TokenURIGen} from "../../utils/TokenURIGen.sol";
 import {TypeCast} from "../../utils/TypeCast.sol";
 
 abstract contract Accessory {
@@ -27,7 +27,7 @@ library SnowmanMetadata {
     string memory description = "This is a snowman";
     string memory image = Base64.encode(bytes(generateSVG(accessories, s_accessoriesById, snowman, tokenId)));
 
-    return TokenURIGenerator.generateSVGTokenURI(name, description, image);
+    return TokenURIGen.generateSVGTokenURI(name, description, image);
   }
 
   function renderSnowman(DataTypes.Snowman calldata snowman) internal pure returns (string memory) {

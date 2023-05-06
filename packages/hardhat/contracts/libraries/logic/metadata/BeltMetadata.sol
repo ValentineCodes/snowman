@@ -5,7 +5,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 import {Base64} from "base64-sol/base64.sol";
 
 import {DataTypes} from "../../types/DataTypes.sol";
-import {TokenURIGenerator} from "../../utils/TokenURIGenerator.sol";
+import {TokenURIGen} from "../../utils/TokenURIGen.sol";
 import {TypeCast} from "../../utils/TypeCast.sol";
 
 library BeltMetadata {
@@ -16,7 +16,7 @@ library BeltMetadata {
     string memory description = string(abi.encodePacked("This is a belt colored #", belt.color));
     string memory image = Base64.encode(bytes(generateSVG(belt)));
 
-    return TokenURIGenerator.generateSVGTokenURI(name, description, image);
+    return TokenURIGen.generateSVGTokenURI(name, description, image);
   }
 
   function renderTokenById(DataTypes.Belt calldata belt) public pure returns (string memory) {

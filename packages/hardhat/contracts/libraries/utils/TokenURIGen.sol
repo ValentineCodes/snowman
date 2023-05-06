@@ -3,7 +3,7 @@ pragma solidity ^0.8.17;
 
 import {Base64} from "base64-sol/base64.sol";
 
-library TokenURIGenerator {
+library TokenURIGen {
   function generateSVGTokenURI(
     string calldata name,
     string calldata description,

@@ -22,14 +22,14 @@ const deployScarf: DeployFunction = async function (hre: HardhatRuntimeEnvironme
   const { deploy } = hre.deployments;
 
   // Deploy libraries
-  const tokenURIGenerator = await deploy("TokenURIGenerator", {
+  const TokenURIGen = await deploy("TokenURIGen", {
     from: deployer,
   });
 
   const scarfMetadata = await deploy("ScarfMetadata", {
     from: deployer,
     libraries: {
-      TokenURIGenerator: tokenURIGenerator.address,
+      TokenURIGen: TokenURIGen.address,
     },
   });
 

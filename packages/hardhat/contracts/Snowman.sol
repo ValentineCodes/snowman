@@ -10,7 +10,7 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 import {DataTypes} from "./libraries/types/DataTypes.sol";
 import {SnowmanMetadata} from "./libraries/logic/metadata/SnowmanMetadata.sol";
 import {TypeCast} from "./libraries/utils/TypeCast.sol";
-import {ColorGenerator} from "./libraries/utils/ColorGenerator.sol";
+import {ColorGen} from "./libraries/utils/ColorGen.sol";
 import {PRNG} from "./libraries/utils/PRNG.sol";
 
 error Snowman__NotMinted();
@@ -67,7 +67,7 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
 
     // generate random cloud and button color
     for (uint256 i = 0; i < 2; i++) {
-      colors[i] = ColorGenerator.HEX(bytes32(i));
+      colors[i] = ColorGen.HEX(bytes32(i));
     }
 
     snowman = DataTypes.Snowman({perspective: PRNG.range(328, 347), cloudColor: colors[0], buttonColor: colors[1]});

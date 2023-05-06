@@ -6,7 +6,7 @@ import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 import {console} from "hardhat/console.sol";
 
-library ColorGenerator {
+library ColorGen {
   using PRNG for uint256;
   using Strings for uint256;
 
@@ -133,7 +133,7 @@ library ColorGenerator {
     return color;
   }
 
-  function _formatHEX(bytes3 value) private pure returns (string memory) {
+  function _formatHEX(bytes3 value) internal pure returns (string memory) {
     bytes memory buffer = new bytes(6);
     for (uint256 i = 0; i < 3; i++) {
       buffer[i * 2 + 1] = ALPHABET[uint8(value[i]) & 0xf];
@@ -142,11 +142,11 @@ library ColorGenerator {
     return string(abi.encodePacked("#", buffer));
   }
 
-  function _formatRGB(uint256 r, uint256 g, uint256 b) private pure returns (string memory) {
+  function _formatRGB(uint256 r, uint256 g, uint256 b) internal pure returns (string memory) {
     return string(abi.encodePacked("rgb(", r.toString(), ",", g.toString(), ",", b.toString(), ")"));
   }
 
-  function _formatRGBA(uint256 r, uint256 g, uint256 b, uint256 a) private pure returns (string memory) {
+  function _formatRGBA(uint256 r, uint256 g, uint256 b, uint256 a) internal pure returns (string memory) {
     if (a < MAX_ALPHA) {
       return
         string(abi.encodePacked("rgb(", r.toString(), ",", g.toString(), ",", b.toString(), ", 0.", a.toString(), ")"));
@@ -155,11 +155,11 @@ library ColorGenerator {
     }
   }
 
-  function _formatHSL(uint256 h, uint256 s, uint256 l) private pure returns (string memory) {
+  function _formatHSL(uint256 h, uint256 s, uint256 l) internal pure returns (string memory) {
     return string(abi.encodePacked("rgb(", h.toString(), ",", s.toString(), "%,", l.toString(), "%)"));
   }
 
-  function _formatHSLA(uint256 h, uint256 s, uint256 l, uint256 a) private pure returns (string memory) {
+  function _formatHSLA(uint256 h, uint256 s, uint256 l, uint256 a) internal pure returns (string memory) {
     if (a < MAX_ALPHA) {
       return
         string(

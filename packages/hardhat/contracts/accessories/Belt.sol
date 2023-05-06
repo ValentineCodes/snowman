@@ -10,7 +10,7 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 import {DataTypes} from "../libraries/types/DataTypes.sol";
 import {BeltMetadata} from "../libraries/logic/metadata/BeltMetadata.sol";
 import {TypeCast} from "../libraries/utils/TypeCast.sol";
-import {ColorGenerator} from "../libraries/utils/ColorGenerator.sol";
+import {ColorGen} from "../libraries/utils/ColorGen.sol";
 
 error Belt__NotMinted();
 error Belt__NotEnoughEth();
@@ -44,7 +44,7 @@ contract Belt is ERC721, Ownable {
     _mint(msg.sender, tokenId);
 
     // generate random color
-    s_attributes[tokenId] = DataTypes.Belt({color: ColorGenerator.HEX()});
+    s_attributes[tokenId] = DataTypes.Belt({color: ColorGen.HEX()});
 
     // transfer mint fee
     (bool success, ) = payable(owner()).call{value: msg.value}("");

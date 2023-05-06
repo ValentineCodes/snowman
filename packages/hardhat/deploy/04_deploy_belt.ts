@@ -22,14 +22,14 @@ const deployBelt: DeployFunction = async function (hre: HardhatRuntimeEnvironmen
   const { deploy } = hre.deployments;
 
   // Deploy libraries
-  const tokenURIGenerator = await deploy("TokenURIGenerator", {
+  const TokenURIGen = await deploy("TokenURIGen", {
     from: deployer,
   });
 
   const beltMetadata = await deploy("BeltMetadata", {
     from: deployer,
     libraries: {
-      TokenURIGenerator: tokenURIGenerator.address,
+      TokenURIGen: TokenURIGen.address,
     },
   });
 

@@ -22,14 +22,14 @@ const deployHat: DeployFunction = async function (hre: HardhatRuntimeEnvironment
   const { deploy } = hre.deployments;
 
   // Deploy libraries
-  const tokenURIGenerator = await deploy("TokenURIGenerator", {
+  const TokenURIGen = await deploy("TokenURIGen", {
     from: deployer,
   });
 
   const hatMetadata = await deploy("HatMetadata", {
     from: deployer,
     libraries: {
-      TokenURIGenerator: tokenURIGenerator.address,
+      TokenURIGen: TokenURIGen.address,
     },
   });
 

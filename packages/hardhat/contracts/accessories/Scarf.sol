@@ -10,7 +10,7 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 import {DataTypes} from "../libraries/types/DataTypes.sol";
 import {ScarfMetadata} from "../libraries/logic/metadata/ScarfMetadata.sol";
 import {TypeCast} from "../libraries/utils/TypeCast.sol";
-import {ColorGenerator} from "../libraries/utils/ColorGenerator.sol";
+import {ColorGen} from "../libraries/utils/ColorGen.sol";
 
 error Scarf__NotMinted();
 error Scarf__NotEnoughEth();
@@ -44,7 +44,7 @@ contract Scarf is ERC721, Ownable {
     _mint(msg.sender, tokenId);
 
     // generate random color
-    s_attributes[tokenId] = DataTypes.Scarf({color: ColorGenerator.HEX()});
+    s_attributes[tokenId] = DataTypes.Scarf({color: ColorGen.HEX()});
 
     // transfer mint fee
     (bool success, ) = payable(owner()).call{value: msg.value}("");
