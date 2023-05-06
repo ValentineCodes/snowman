@@ -32,6 +32,11 @@ abstract contract Accessory {
   function transferFrom(address from, address to, uint256 id) external virtual;
 }
 
+/**
+ * @title Snowman - ERC4883 Composable Snowman NFT
+ * @author Valentine Orga
+ * @notice Mint snowman and compose with other accessories(other NFTs) approved by the admin.
+ */
 contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
   using TypeCast for bytes;
   using Counters for Counters.Counter;
