@@ -59,12 +59,6 @@ contract Hat is ERC721, Ownable {
     return HatMetadata.tokenURI(s_attributes[tokenId], tokenId);
   }
 
-  function generateSVG(uint256 tokenId) public view returns (string memory) {
-    if (!_exists(tokenId)) revert Hat__NotMinted();
-
-    return HatMetadata.generateSVG(s_attributes[tokenId]);
-  }
-
   function renderTokenById(uint256 tokenId) public view returns (string memory) {
     return HatMetadata.renderTokenById(s_attributes[tokenId]);
   }

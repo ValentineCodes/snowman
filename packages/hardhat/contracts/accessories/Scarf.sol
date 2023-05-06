@@ -61,12 +61,6 @@ contract Scarf is ERC721, Ownable {
     return ScarfMetadata.tokenURI(scarf, tokenId);
   }
 
-  function generateSVG(uint256 tokenId) public view returns (string memory) {
-    if (!_exists(tokenId)) revert Scarf__NotMinted();
-
-    return ScarfMetadata.generateSVG(s_attributes[tokenId]);
-  }
-
   function renderTokenById(uint256 tokenId) public view returns (string memory) {
     DataTypes.Scarf memory scarf = s_attributes[tokenId];
 

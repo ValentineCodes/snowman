@@ -98,7 +98,7 @@ library SnowmanMetadata {
     mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
     DataTypes.Snowman calldata snowman,
     uint256 tokenId
-  ) public view returns (string memory) {
+  ) internal view returns (string memory) {
     string memory cloud = string(
       abi.encodePacked('<rect x="1" y="4" width="1433" height="1235" fill="', snowman.cloudColor, '" />')
     );

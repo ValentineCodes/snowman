@@ -33,7 +33,7 @@ library HatMetadata {
       );
   }
 
-  function generateSVG(DataTypes.Hat calldata hat) public pure returns (string memory) {
+  function generateSVG(DataTypes.Hat calldata hat) internal pure returns (string memory) {
     return
       string(
         abi.encodePacked(

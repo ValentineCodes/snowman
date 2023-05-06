@@ -19,7 +19,7 @@ interface ISnowman {
 
   function tokenURI(uint256 tokenId) external view returns (string memory);
 
-  function generateSVG(uint256 tokenId) external view returns (string memory);
+  // function generateSVG(uint256 tokenId) external view returns (string memory);
 
   function renderTokenById(uint256 tokenId) external view returns (string memory);
 

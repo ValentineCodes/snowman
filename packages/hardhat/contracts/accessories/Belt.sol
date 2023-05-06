@@ -61,12 +61,6 @@ contract Belt is ERC721, Ownable {
     return BeltMetadata.tokenURI(belt, tokenId);
   }
 
-  function generateSVG(uint256 tokenId) public view returns (string memory) {
-    if (!_exists(tokenId)) revert Belt__NotMinted();
-
-    return BeltMetadata.generateSVG(s_attributes[tokenId]);
-  }
-
   function renderTokenById(uint256 tokenId) public view returns (string memory) {
     DataTypes.Belt memory belt = s_attributes[tokenId];
 

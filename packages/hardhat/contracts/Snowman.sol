@@ -27,6 +27,8 @@ error Snowman__AccessoryNotWorn();
 error Snowman__NotAccessoryOwner();
 error Snowman__NotOwner();
 error Snowman__UnavailableAccessory();
+error Snowman__NoAccessories();
+error Snowman__AccessoriesCountMismatch();
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);
@@ -95,6 +97,21 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
     s_accessories.push(DataTypes.Accessory(accessory, position));
   }
 
+  function addAccessories(
+    address[] calldata accessories,
+    DataTypes.AccessoryPosition[] calldata positions
+  ) public onlyOwner {
+    uint256 totalAccessories = accessories.length;
+    uint256 totalPositions = positions.length;
+
+    if (totalAccessories == 0) revert Snowman__NoAccessories();
+    if (totalAccessories != totalPositions) revert Snowman__AccessoriesCountMismatch();
+
+    for (uint256 i = 0; i < totalAccessories; i++) {
+      addAccessory(accessories[i], positions[i]);
+    }
+  }
+
   function removeAccessory(address accessory, uint256 snowmanId) public {
     if (ownerOf(snowmanId) != msg.sender) revert Snowman__NotOwner();
     if (!hasAccessory(accessory, snowmanId)) revert Snowman__AccessoryNotWorn();
@@ -106,9 +123,9 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
     if (msg.sender != ownerOf(snowmanId)) revert Snowman__NotAccessoryOwner();
 
     DataTypes.Accessory[] memory accessories = s_accessories;
-
+    uint256 totalAccessories = accessories.length;
     // remove all accessories from snowman
-    for (uint i = 0; i < accessories.length; i++) {
+    for (uint i = 0; i < totalAccessories; i++) {
       if (s_accessoriesById[accessories[i]._address][snowmanId] > 0) {
         _removeAccessory(accessories[i]._address, snowmanId);
       }
@@ -136,16 +153,14 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
   function tokenURI(uint256 tokenId) public view override(ERC721, ISnowman) returns (string memory) {
     if (!_exists(tokenId)) revert Snowman__NotMinted();
 
-    DataTypes.Snowman memory snowman = s_attributes[tokenId];
-
-    return SnowmanMetadata.tokenURI(s_accessories, s_accessoriesById, snowman, tokenId);
+    return SnowmanMetadata.tokenURI(s_accessories, s_accessoriesById, s_attributes[tokenId], tokenId);
   }
 
-  function generateSVG(uint256 tokenId) public view returns (string memory) {
-    if (!_exists(tokenId)) revert Snowman__NotMinted();
+  // function generateSVG(uint256 tokenId) public view returns (string memory) {
+  //   if (!_exists(tokenId)) revert Snowman__NotMinted();
 
-    return SnowmanMetadata.generateSVG(s_accessories, s_accessoriesById, s_attributes[tokenId], tokenId);
-  }
+  //   return SnowmanMetadata.generateSVG(s_accessories, s_accessoriesById, s_attributes[tokenId], tokenId);
+  // }
 
   function renderTokenById(uint256 tokenId) public view returns (string memory) {
     DataTypes.Snowman memory snowman = s_attributes[tokenId];
