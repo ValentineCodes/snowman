@@ -82,7 +82,7 @@ library SnowmanMetadata {
       uint256 accessoryTokenId = s_accessoriesById[accessory._address][tokenId];
 
       if (accessoryTokenId > 0) {
-        if (accessory.position == DataTypes.AccessoryPosition.Front) {
+        if (accessory.position == DataTypes.AccessoryPosition.Foreground) {
           token = string(abi.encodePacked(token, Accessory(accessory._address).renderTokenById(accessoryTokenId)));
         } else {
           token = string(abi.encodePacked(Accessory(accessory._address).renderTokenById(accessoryTokenId), token));
