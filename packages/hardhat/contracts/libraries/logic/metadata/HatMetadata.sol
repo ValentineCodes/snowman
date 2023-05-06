@@ -10,11 +10,10 @@ import {TypeCast} from "../../utils/TypeCast.sol";
 
 library HatMetadata {
   using Strings for uint256;
-  using TypeCast for bytes3;
 
   function tokenURI(DataTypes.Hat calldata hat, uint256 tokenId) external pure returns (string memory) {
     string memory name = string(abi.encodePacked("Hat: #", tokenId.toString()));
-    string memory description = string(abi.encodePacked("This is a hat colored #", hat.color.toColor()));
+    string memory description = string(abi.encodePacked("This is a hat colored #", hat.color));
     string memory image = Base64.encode(bytes(generateSVG(hat)));
 
     return TokenURIGenerator.generateSVGTokenURI(name, description, image);
@@ -24,11 +23,11 @@ library HatMetadata {
     return
       string(
         abi.encodePacked(
-          '<rect x="680" y="104" width="224" height="113" rx="56.5" fill="#',
-          hat.color.toColor(),
+          '<rect x="680" y="104" width="224" height="113" rx="56.5" fill="',
+          hat.color,
           '" stroke="black" stroke-width="6" />',
-          '<path d="M914.067 340.138L677.655 347.584C637.357 348.853 604 316.53 604 276.213C604 244.166 625.35 216.044 656.218 207.432L740.294 183.975C772.808 174.904 807.176 174.834 839.727 183.771L929.707 208.476C958.821 216.47 979 242.937 979 273.127C979 309.333 950.254 338.998 914.067 340.138Z" fill="#',
-          hat.color.toColor(),
+          '<path d="M914.067 340.138L677.655 347.584C637.357 348.853 604 316.53 604 276.213C604 244.166 625.35 216.044 656.218 207.432L740.294 183.975C772.808 174.904 807.176 174.834 839.727 183.771L929.707 208.476C958.821 216.47 979 242.937 979 273.127C979 309.333 950.254 338.998 914.067 340.138Z" fill="',
+          hat.color,
           '" stroke="black" stroke-width="6" />'
         )
       );

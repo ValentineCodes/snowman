@@ -14,19 +14,19 @@ library DataTypes {
 
   struct Snowman {
     uint256 perspective;
-    bytes3 cloudColor;
-    bytes3 buttonColor;
+    string cloudColor;
+    string buttonColor;
   }
 
   struct Hat {
-    bytes3 color;
+    string color;
   }
 
   struct Scarf {
-    bytes3 color;
+    string color;
   }
 
   struct Belt {
-    bytes3 color;
+    string color;
   }
 }

@@ -16,7 +16,6 @@ abstract contract Accessory {
 
 library SnowmanMetadata {
   using Strings for uint256;
-  using TypeCast for bytes3;
 
   function tokenURI(
     DataTypes.Accessory[] calldata accessories,
@@ -32,9 +31,6 @@ library SnowmanMetadata {
   }
 
   function renderSnowman(DataTypes.Snowman calldata snowman) internal pure returns (string memory) {
-    string
-      memory snowyGround = '<path d="M2.5 1271.5V870.969C193.505 715.311 403.061 701.422 638.973 733.615C737.077 747.003 839.635 768.343 947.273 790.741C969.306 795.326 991.552 799.955 1014.02 804.569C1145.51 831.577 1284.39 858.057 1431.5 872.057V1271.5H2.5Z" fill="white" stroke="#ccc" stroke-width="5" />';
-
     string memory face = string(
       abi.encodePacked(
         '<path d="M936 394C936 463.274 868.961 520 785.5 520C702.039 520 635 463.274 635 394C635 324.726 702.039 268 785.5 268C868.961 268 936 324.726 936 394Z" fill="white" stroke="#ccc" stroke-width="4" /> <path d="M759.13 336.817C759.13 349.926 747.955 360.635 734.065 360.635C720.175 360.635 709 349.926 709 336.817C709 323.709 720.175 313 734.065 313C747.955 313 759.13 323.709 759.13 336.817Z" fill="#F9F8F8" stroke="black" stroke-width="2" /> <path d="M863.389 336.817C863.389 349.926 852.214 360.635 838.324 360.635C824.435 360.635 813.259 349.926 813.259 336.817C813.259 323.709 824.435 313 838.324 313C852.214 313 863.389 323.709 863.389 336.817Z" fill="white" stroke="black" stroke-width="2" />',
@@ -56,19 +52,19 @@ library SnowmanMetadata {
     string memory lowerBody = string(
       abi.encodePacked(
         '<path d="M1130.5 1023.52C1130.5 1075.95 1086.79 1130.42 1019.74 1171.96C952.854 1213.41 863.46 1241.5 773.611 1241.5C683.878 1241.5 603.767 1208.97 546.111 1163.12C488.379 1117.2 453.5 1058.22 453.5 1005.48C453.5 953.051 497.212 898.583 564.261 857.038C631.146 815.594 720.54 787.5 810.389 787.5C900.122 787.5 980.233 820.028 1037.89 865.885C1095.62 911.803 1130.5 970.784 1130.5 1023.52Z" fill="white" stroke="#ccc" stroke-width="5" />',
-        '<ellipse cx="792" cy="1013" rx="40" ry="39" fill="#',
-        snowman.buttonColor.toColor(),
-        '" /><ellipse cx="796.5" cy="886" rx="37.5" ry="39" fill="#',
-        snowman.buttonColor.toColor(),
-        '" /><ellipse cx="791.5" cy="728.5" rx="32.5" ry="34.5" fill="#',
-        snowman.buttonColor.toColor(),
-        '" /><ellipse cx="796" cy="617" rx="24" ry="25" fill="#',
-        snowman.buttonColor.toColor(),
+        '<ellipse cx="792" cy="1013" rx="40" ry="39" fill="',
+        snowman.buttonColor,
+        '" /><ellipse cx="796.5" cy="886" rx="37.5" ry="39" fill="',
+        snowman.buttonColor,
+        '" /><ellipse cx="791.5" cy="728.5" rx="32.5" ry="34.5" fill="',
+        snowman.buttonColor,
+        '" /><ellipse cx="796" cy="617" rx="24" ry="25" fill="',
+        snowman.buttonColor,
         '" />'
       )
     );
 
-    return string(abi.encodePacked(snowyGround, face, middleBody, lowerBody));
+    return string(abi.encodePacked(face, middleBody, lowerBody));
   }
 
   function renderTokenById(
@@ -104,8 +100,11 @@ library SnowmanMetadata {
     uint256 tokenId
   ) internal view returns (string memory) {
     string memory cloud = string(
-      abi.encodePacked('<rect x="1" y="4" width="1433" height="1235" fill="#', snowman.cloudColor.toColor(), '" />')
+      abi.encodePacked('<rect x="1" y="4" width="1433" height="1235" fill="', snowman.cloudColor, '" />')
     );
+
+    string
+      memory snowyGround = '<path d="M2.5 1271.5V870.969C193.505 715.311 403.061 701.422 638.973 733.615C737.077 747.003 839.635 768.343 947.273 790.741C969.306 795.326 991.552 799.955 1014.02 804.569C1145.51 831.577 1284.39 858.057 1431.5 872.057V1271.5H2.5Z" fill="white" stroke="#ccc" stroke-width="5" />';
 
     string
       memory snowfallBehind = '<circle cx="504.928" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="8.236s" fill="reset" repeatCount="indefinite" /></circle><circle cx="1250.77" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="3.982s" fill="reset" repeatCount="indefinite" /></circle><circle cx="205.714" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="4.249s" fill="reset" repeatCount="indefinite" /></circle><circle cx="329.535" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="7.113s" fill="reset" repeatCount="indefinite" /></circle><circle cx="167.398 " r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="3.5s" fill="reset" repeatCount="indefinite" /></circle><circle cx="1124.15" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="4.5s" fill="reset" repeatCount="indefinite" /></circle><circle cx="712.952" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="4.782s" fill="reset" repeatCount="indefinite" /></circle><circle cx="355.028" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="7.201s" fill="reset" repeatCount="indefinite" /></circle><circle cx="1204.46" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="5.289s" fill="reset" repeatCount="indefinite" /></circle><circle cx="596.703" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="4.892s" fill="reset" repeatCount="indefinite" /></circle><circle cx="1216.56" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="6.4s" fill="reset" repeatCount="indefinite" /></circle><circle cx="707.39" r="15.2929" fill="white" stroke="#ccc" stroke-width="3"><animate attributeName="cy" from="5" to="1000" dur="3.3s" fill="reset" repeatCount="indefinite" /></circle>';
@@ -117,6 +116,7 @@ library SnowmanMetadata {
         abi.encodePacked(
           '<svg width="100%" height="100%" viewBox="0 0 1453 1274" fill="none" xmlns="http://www.w3.org/2000/svg">',
           cloud,
+          snowyGround,
           snowfallBehind,
           renderTokenById(accessories, s_accessoriesById, snowman, tokenId),
           snowfallInFront,

@@ -10,6 +10,8 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 import {DataTypes} from "./libraries/types/DataTypes.sol";
 import {SnowmanMetadata} from "./libraries/logic/metadata/SnowmanMetadata.sol";
 import {TypeCast} from "./libraries/utils/TypeCast.sol";
+import {ColorGenerator} from "./libraries/utils/ColorGenerator.sol";
+import {PRNG} from "./libraries/utils/PRNG.sol";
 
 error Snowman__NotMinted();
 error Snowman__NotEnoughEth();
@@ -61,18 +63,14 @@ contract Snowman is ERC721Enumerable, IERC721Receiver, Ownable {
     _mint(msg.sender, tokenId);
 
     DataTypes.Snowman memory snowman;
-    bytes3[2] memory colors;
+    string[2] memory colors;
 
     // generate random cloud and button color
     for (uint256 i = 0; i < 2; i++) {
-      bytes32 randHash = keccak256(abi.encodePacked(i + 1, blockhash(block.number - 1), msg.sender, address(this)));
-      colors[i] = bytes2(randHash[0]) | (bytes2(randHash[1]) >> 8) | (bytes3(randHash[2]) >> 16);
+      colors[i] = ColorGenerator.HEX(bytes32(i));
     }
 
-    // generate random perspective
-    uint256 randNum = uint256(keccak256(abi.encodePacked(blockhash(block.number - 1), msg.sender, address(this)))) % 20;
-
-    snowman = DataTypes.Snowman({perspective: randNum + 328, cloudColor: colors[0], buttonColor: colors[1]});
+    snowman = DataTypes.Snowman({perspective: PRNG.range(328, 347), cloudColor: colors[0], buttonColor: colors[1]});
 
     s_attributes[tokenId] = snowman;
 

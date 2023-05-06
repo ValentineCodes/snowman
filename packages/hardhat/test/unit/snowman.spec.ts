@@ -68,7 +68,7 @@ describe("Snowman☃️", () => {
       await belt["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
 
       console.log("Added hat and scarf as an accessory✅");
-      console.log(await snowman.tokenURI(1));
+      console.log(await snowman.renderTokenById(1));
     });
   });
 });

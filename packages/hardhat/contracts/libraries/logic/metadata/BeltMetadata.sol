@@ -10,11 +10,10 @@ import {TypeCast} from "../../utils/TypeCast.sol";
 
 library BeltMetadata {
   using Strings for uint256;
-  using TypeCast for bytes3;
 
   function tokenURI(DataTypes.Belt calldata belt, uint256 tokenId) external pure returns (string memory) {
     string memory name = string(abi.encodePacked("Belt: #", tokenId.toString()));
-    string memory description = string(abi.encodePacked("This is a belt colored #", belt.color.toColor()));
+    string memory description = string(abi.encodePacked("This is a belt colored #", belt.color));
     string memory image = Base64.encode(bytes(generateSVG(belt)));
 
     return TokenURIGenerator.generateSVGTokenURI(name, description, image);
@@ -24,8 +23,8 @@ library BeltMetadata {
     return
       string(
         abi.encodePacked(
-          '<path d="M659.486 768.674C712.328 793.762 877.834 783.727 916.718 768.674C955.602 753.622 916.718 809.818 916.718 809.818C821.372 840.676 765.505 843.417 659.486 809.818C659.486 809.818 606.643 743.587 659.486 768.674Z" fill="#',
-          belt.color.toColor(),
+          '<path d="M659.486 768.674C712.328 793.762 877.834 783.727 916.718 768.674C955.602 753.622 916.718 809.818 916.718 809.818C821.372 840.676 765.505 843.417 659.486 809.818C659.486 809.818 606.643 743.587 659.486 768.674Z" fill="',
+          belt.color,
           '" />'
         )
       );

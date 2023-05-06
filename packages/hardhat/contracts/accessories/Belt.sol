@@ -44,7 +44,7 @@ contract Belt is ERC721, Ownable {
     _mint(msg.sender, tokenId);
 
     // generate random color
-    s_attributes[tokenId] = DataTypes.Belt({color: ColorGenerator.generateHexColor()});
+    s_attributes[tokenId] = DataTypes.Belt({color: ColorGenerator.HEX()});
 
     // transfer mint fee
     (bool success, ) = payable(owner()).call{value: msg.value}("");
