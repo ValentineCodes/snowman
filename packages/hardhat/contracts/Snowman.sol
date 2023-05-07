@@ -80,7 +80,12 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
       colors[i] = ColorGen.HSLA(bytes32(i));
     }
 
-    snowman = DataTypes.Snowman({eyePosY: PRNG.range(328, 347), cloudColor: colors[0], buttonColor: colors[1]});
+    snowman = DataTypes.Snowman({
+      eyePosY: PRNG.range(328, 347),
+      cloudColor: colors[0],
+      buttonColor: colors[1],
+      snowAnimOffsetX: PRNG.range(0, 300)
+    });
 
     s_attributes[tokenId] = snowman;
 
