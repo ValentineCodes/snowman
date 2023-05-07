@@ -13,7 +13,7 @@ library DataTypes {
   }
 
   struct Snowman {
-    uint256 perspective;
+    uint256 eyePosY;
     string cloudColor;
     string buttonColor;
   }
