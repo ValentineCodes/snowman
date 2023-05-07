@@ -130,7 +130,7 @@ library ColorGen {
     return color;
   }
 
-  function _formatHEX(bytes3 value) internal pure returns (string memory) {
+  function _formatHEX(bytes3 value) private pure returns (string memory) {
     bytes memory buffer = new bytes(6);
     for (uint256 i = 0; i < 3; i++) {
       buffer[i * 2 + 1] = ALPHABET[uint8(value[i]) & 0xf];
@@ -139,11 +139,11 @@ library ColorGen {
     return string(abi.encodePacked("#", buffer));
   }
 
-  function _formatRGB(uint256 r, uint256 g, uint256 b) internal pure returns (string memory) {
+  function _formatRGB(uint256 r, uint256 g, uint256 b) private pure returns (string memory) {
     return string(abi.encodePacked("rgb(", r.toString(), ", ", g.toString(), ", ", b.toString(), ")"));
   }
 
-  function _formatRGBA(uint256 r, uint256 g, uint256 b, uint256 a) internal pure returns (string memory) {
+  function _formatRGBA(uint256 r, uint256 g, uint256 b, uint256 a) private pure returns (string memory) {
     if (a < MAX_ALPHA) {
       return
         string(
@@ -154,11 +154,11 @@ library ColorGen {
     }
   }
 
-  function _formatHSL(uint256 h, uint256 s, uint256 l) internal pure returns (string memory) {
+  function _formatHSL(uint256 h, uint256 s, uint256 l) private pure returns (string memory) {
     return string(abi.encodePacked("hsl(", h.toString(), ", ", s.toString(), "%, ", l.toString(), "%)"));
   }
 
-  function _formatHSLA(uint256 h, uint256 s, uint256 l, uint256 a) internal pure returns (string memory) {
+  function _formatHSLA(uint256 h, uint256 s, uint256 l, uint256 a) private pure returns (string memory) {
     if (a < MAX_ALPHA) {
       return
         string(
