@@ -33,12 +33,20 @@ const deploySnowman: DeployFunction = async function (hre: HardhatRuntimeEnviron
     },
   });
 
+  const accessoryManager = await deploy("AccessoryManager", {
+    from: deployer,
+    libraries: {
+      TokenURIGen: TokenURIGen.address,
+    },
+  });
+
   await deploy("Snowman", {
     from: deployer,
     args: [deployer],
     log: true,
     libraries: {
       SnowmanMetadata: snowmanMetadata.address,
+      AccessoryManager: accessoryManager.address,
     },
     // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
     // automatically mining the contract deployment transaction. There is no effect on live networks.

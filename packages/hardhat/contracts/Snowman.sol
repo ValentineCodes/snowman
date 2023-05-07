@@ -14,6 +14,7 @@ import {SnowmanMetadata} from "./libraries/logic/metadata/SnowmanMetadata.sol";
 import {TypeCast} from "./libraries/utils/TypeCast.sol";
 import {ColorGen} from "./libraries/utils/ColorGen.sol";
 import {PRNG} from "./libraries/utils/PRNG.sol";
+import {AccessoryManager} from "./libraries/logic/AccessoryManager.sol";
 
 error Snowman__NotMinted();
 error Snowman__NotEnoughEth();
@@ -84,7 +85,7 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
       eyePosY: PRNG.range(328, 347),
       cloudColor: colors[0],
       buttonColor: colors[1],
-      snowAnimOffsetX: PRNG.range(0, 300)
+      snowAnimOffsetX: int256((PRNG.randomNumber() % 601) - 300)
     });
 
     s_attributes[tokenId] = snowman;
@@ -97,62 +98,30 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
   }
 
   function addAccessory(address accessory, DataTypes.AccessoryPosition position) public onlyOwner {
-    if (s_accessoriesAvailable[accessory]) revert Snowman__AcccessoryAlreadyExists();
-    s_accessoriesAvailable[accessory] = true;
-    s_accessories.push(DataTypes.Accessory(accessory, position));
+    AccessoryManager.addAccessory(s_accessoriesAvailable, s_accessories, accessory, position);
   }
 
   function addAccessories(
     address[] calldata accessories,
     DataTypes.AccessoryPosition[] calldata positions
   ) public onlyOwner {
-    uint256 totalAccessories = accessories.length;
-    uint256 totalPositions = positions.length;
-
-    if (totalAccessories == 0) revert Snowman__NoAccessories();
-    if (totalAccessories != totalPositions) revert Snowman__AccessoriesCountMismatch();
-
-    for (uint256 i = 0; i < totalAccessories; i++) {
-      addAccessory(accessories[i], positions[i]);
-    }
+    AccessoryManager.addAccessories(s_accessoriesAvailable, s_accessories, accessories, positions);
   }
 
   function removeAccessory(address accessory, uint256 snowmanId) public {
-    if (ownerOf(snowmanId) != msg.sender) revert Snowman__NotOwner();
-    if (!hasAccessory(accessory, snowmanId)) revert Snowman__AccessoryNotWorn();
-
-    _removeAccessory(accessory, snowmanId);
+    AccessoryManager.removeAccessory(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId);
   }
 
   function removeAllAccessories(uint256 snowmanId) public {
-    if (msg.sender != ownerOf(snowmanId)) revert Snowman__NotAccessoryOwner();
-
-    DataTypes.Accessory[] memory accessories = s_accessories;
-    uint256 totalAccessories = accessories.length;
-    // remove all accessories from snowman
-    for (uint i = 0; i < totalAccessories; i++) {
-      if (s_accessoriesById[accessories[i]._address][snowmanId] > 0) {
-        _removeAccessory(accessories[i]._address, snowmanId);
-      }
-    }
-  }
-
-  function _removeAccessory(address accessory, uint256 snowmanId) internal {
-    Accessory(accessory).transferFrom(address(this), ownerOf(snowmanId), s_accessoriesById[accessory][snowmanId]);
-
-    s_accessoriesById[accessory][snowmanId] = 0;
+    AccessoryManager.removeAllAccessories(s_accessories, s_accessoriesById, snowmanId);
   }
 
   function hasAccessory(address accessory, uint256 snowmanId) public view returns (bool) {
-    if (!s_accessoriesAvailable[accessory]) revert Snowman__UnavailableAccessory();
-
-    return (s_accessoriesById[accessory][snowmanId] != 0);
+    return AccessoryManager.hasAccessory(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId);
   }
 
   function accessoryId(address accessory, uint256 snowmanId) external view returns (uint256) {
-    if (!s_accessoriesAvailable[accessory]) revert Snowman__UnavailableAccessory();
-
-    return s_accessoriesById[accessory][snowmanId];
+    return AccessoryManager.accessoryId(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId);
   }
 
   function tokenURI(uint256 tokenId) public view override(ERC721, ISnowman) returns (string memory) {
@@ -160,12 +129,6 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
 
     return SnowmanMetadata.tokenURI(s_accessories, s_accessoriesById, s_attributes[tokenId], tokenId);
   }
-
-  // function generateSVG(uint256 tokenId) public view returns (string memory) {
-  //   if (!_exists(tokenId)) revert Snowman__NotMinted();
-
-  //   return SnowmanMetadata.generateSVG(s_accessories, s_accessoriesById, s_attributes[tokenId], tokenId);
-  // }
 
   function renderTokenById(uint256 tokenId) public view returns (string memory) {
     DataTypes.Snowman memory snowman = s_attributes[tokenId];

@@ -3,8 +3,9 @@
 pragma solidity ^0.8.17;
 
 import {DataTypes} from "../libraries/types/DataTypes.sol";
+import {IERC721Enumerable} from "@openzeppelin/contracts/interfaces/IERC721Enumerable.sol";
 
-interface ISnowman {
+interface ISnowman is IERC721Enumerable {
   function mint() external payable returns (uint256);
 
   function addAccessory(address accessory, DataTypes.AccessoryPosition position) external;
@@ -18,8 +19,6 @@ interface ISnowman {
   function accessoryId(address accessory, uint256 snowmanId) external view returns (uint256);
 
   function tokenURI(uint256 tokenId) external view returns (string memory);
-
-  // function generateSVG(uint256 tokenId) external view returns (string memory);
 
   function renderTokenById(uint256 tokenId) external view returns (string memory);
 

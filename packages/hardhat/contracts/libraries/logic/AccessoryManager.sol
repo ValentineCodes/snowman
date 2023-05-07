@@ -1,0 +1,121 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
+
+import {DataTypes} from "../types/DataTypes.sol";
+import {ISnowman} from "../../interfaces/ISnowman.sol";
+
+error Snowman__NotMinted();
+error Snowman__NotEnoughEth();
+error Snowman__TransferFailed();
+error Snowman__ZeroAddress();
+error Snowman__InvalidFeeCollector();
+error Snowman__AcccessoryAlreadyExists();
+error Snowman__CannotWearAccessory();
+error Snowman__AccessoryAlreadyWorn();
+error Snowman__AccessoryNotWorn();
+error Snowman__NotAccessoryOwner();
+error Snowman__NotOwner();
+error Snowman__UnavailableAccessory();
+error Snowman__NoAccessories();
+error Snowman__AccessoriesCountMismatch();
+
+abstract contract Accessory {
+  function renderTokenById(uint256 id) external view virtual returns (string memory);
+
+  function transferFrom(address from, address to, uint256 id) external virtual;
+}
+
+library AccessoryManager {
+  function addAccessory(
+    mapping(address => bool) storage s_accessoriesAvailable,
+    DataTypes.Accessory[] storage s_accessories,
+    address accessory,
+    DataTypes.AccessoryPosition position
+  ) internal {
+    if (s_accessoriesAvailable[accessory]) revert Snowman__AcccessoryAlreadyExists();
+    s_accessoriesAvailable[accessory] = true;
+    s_accessories.push(DataTypes.Accessory(accessory, position));
+  }
+
+  function addAccessories(
+    mapping(address => bool) storage s_accessoriesAvailable,
+    DataTypes.Accessory[] storage s_accessories,
+    address[] calldata accessories,
+    DataTypes.AccessoryPosition[] calldata positions
+  ) internal {
+    uint256 totalAccessories = accessories.length;
+    uint256 totalPositions = positions.length;
+
+    if (totalAccessories == 0) revert Snowman__NoAccessories();
+    if (totalAccessories != totalPositions) revert Snowman__AccessoriesCountMismatch();
+
+    for (uint256 i = 0; i < totalAccessories; i++) {
+      addAccessory(s_accessoriesAvailable, s_accessories, accessories[i], positions[i]);
+    }
+  }
+
+  function removeAccessory(
+    mapping(address => bool) storage s_accessoriesAvailable,
+    mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
+    address accessory,
+    uint256 snowmanId
+  ) public {
+    if (ISnowman(address(this)).ownerOf(snowmanId) != msg.sender) revert Snowman__NotOwner();
+    if (!hasAccessory(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId))
+      revert Snowman__AccessoryNotWorn();
+
+    _removeAccessory(s_accessoriesById, accessory, snowmanId);
+  }
+
+  function removeAllAccessories(
+    DataTypes.Accessory[] calldata accessories,
+    mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
+    uint256 snowmanId
+  ) public {
+    if (msg.sender != ISnowman(address(this)).ownerOf(snowmanId)) revert Snowman__NotAccessoryOwner();
+
+    uint256 totalAccessories = accessories.length;
+    // remove all accessories from snowman
+    for (uint i = 0; i < totalAccessories; i++) {
+      if (s_accessoriesById[accessories[i]._address][snowmanId] > 0) {
+        _removeAccessory(s_accessoriesById, accessories[i]._address, snowmanId);
+      }
+    }
+  }
+
+  function _removeAccessory(
+    mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
+    address accessory,
+    uint256 snowmanId
+  ) internal {
+    Accessory(accessory).transferFrom(
+      address(this),
+      ISnowman(address(this)).ownerOf(snowmanId),
+      s_accessoriesById[accessory][snowmanId]
+    );
+
+    s_accessoriesById[accessory][snowmanId] = 0;
+  }
+
+  function hasAccessory(
+    mapping(address => bool) storage s_accessoriesAvailable,
+    mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
+    address accessory,
+    uint256 snowmanId
+  ) public view returns (bool) {
+    if (!s_accessoriesAvailable[accessory]) revert Snowman__UnavailableAccessory();
+
+    return (s_accessoriesById[accessory][snowmanId] != 0);
+  }
+
+  function accessoryId(
+    mapping(address => bool) storage s_accessoriesAvailable,
+    mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
+    address accessory,
+    uint256 snowmanId
+  ) public view returns (uint256) {
+    if (!s_accessoriesAvailable[accessory]) revert Snowman__UnavailableAccessory();
+
+    return s_accessoriesById[accessory][snowmanId];
+  }
+}

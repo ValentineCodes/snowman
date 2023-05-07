@@ -16,7 +16,7 @@ library DataTypes {
     uint256 eyePosY;
     string cloudColor;
     string buttonColor;
-    uint256 snowAnimOffsetX;
+    int256 snowAnimOffsetX;
   }
 
   struct Hat {

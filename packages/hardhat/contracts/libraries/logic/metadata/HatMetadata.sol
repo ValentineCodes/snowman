@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {Strings} from "../../../dependencies/Strings.sol";
 import {Base64} from "base64-sol/base64.sol";
 
 import {DataTypes} from "../../types/DataTypes.sol";

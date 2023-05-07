@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import {Strings} from "../../../dependencies/Strings.sol";
 import {Base64} from "base64-sol/base64.sol";
+import {console} from "hardhat/console.sol";
 
 import {DataTypes} from "../../types/DataTypes.sol";
 import {TokenURIGen} from "../../utils/TokenURIGen.sol";
@@ -16,6 +17,7 @@ abstract contract Accessory {
 
 library SnowmanMetadata {
   using Strings for uint256;
+  using Strings for int256;
 
   function tokenURI(
     DataTypes.Accessory[] calldata accessories,
@@ -106,23 +108,147 @@ library SnowmanMetadata {
     string
       memory snowyGround = '<path d="M2.5 1271.5V870.969C193.505 715.311 403.061 701.422 638.973 733.615C737.077 747.003 839.635 768.343 947.273 790.741C969.306 795.326 991.552 799.955 1014.02 804.569C1145.51 831.577 1284.39 858.057 1431.5 872.057V1271.5H2.5Z" fill="white" stroke="#ccc" stroke-width="5" />';
 
-    string
-      memory snowfallForeground = '<g fill="white" stroke="#ccc" stroke-width="3"></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.2s" type="translate" from="482 0" to="482 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.8s" type="translate" from="1204 0" to="1204 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.7s" type="translate" from="1170 0" to="1170 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.8s" type="translate" from="1415 0" to="1415 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.4s" type="translate" from="1400 0" to="1400 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="8.762s" type="translate" from="733 0" to="733 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="5.762s" type="translate" from="805 0" to="805 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.162s" type="translate" from="900 0" to="900 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="9.2s" type="translate" from="1085 0" to="1085 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="9.1s" type="translate" from="226 0" to="226 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.7s" type="translate" from="1009 0" to="1009 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="6.89s" type="translate" from="132 0" to="132 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.56s" type="translate" from="97 0" to="97 1000" repeatCount="indefinite" /></circle></g>';
-
-    string
-      memory snowfallBackground = '<g fill="white" stroke="#ccc" stroke-width="3"><circle r="15.2929"><animateTransform attributeName="transform" dur="8.236s" type="translate" from="504 0" to="504 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.982s" type="translate" from="1250 0" to="1250 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.249s" type="translate" from="205 0" to="205 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="7.113s" type="translate" from="329 0" to="329 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.5s" type="translate" from="167 0" to="167 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.5s" type="translate" from="1124 0" to="1124 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.782s" type="translate" from="712 0" to="712 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="7.201s" type="translate" from="355 0" to="355 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="5.289s" type="translate" from="1204 0" to="1204 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.892s" type="translate" from="596 0" to="596 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="6.4s" type="translate" from="1216 0" to="1216 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.3s" type="translate" from="707 0" to="707 1000" repeatCount="indefinite" /></circle></g>';
-
+    (string memory snowfallForeground, string memory snowfallBackground) = generateSnowfall(snowman);
     return
       string(
         abi.encodePacked(
           '<svg width="100%" height="100%" viewBox="0 0 1453 1274" fill="none" xmlns="http://www.w3.org/2000/svg">',
           cloud,
           snowyGround,
-          snowfallBackground,
-          renderTokenById(accessories, s_accessoriesById, snowman, tokenId),
           snowfallForeground,
+          renderTokenById(accessories, s_accessoriesById, snowman, tokenId),
+          snowfallBackground,
           "</svg>"
         )
       );
+  }
+
+  function generateSnowfall(DataTypes.Snowman calldata snowman) private view returns (string memory, string memory) {
+    console.logInt(snowman.snowAnimOffsetX);
+    string memory snowfallForeground0 = string(
+      abi.encodePacked(
+        '<g fill="white" stroke="#ccc" stroke-width="3"></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.2s" type="translate" from="482 0" to="',
+        (482 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.8s" type="translate" from="1204 0" to="',
+        (1204 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.7s" type="translate" from="1170 0" to="',
+        (1170 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle>'
+      )
+    );
+    string memory snowfallForeground1 = string(
+      abi.encodePacked(
+        '<circle r="15.2929"><animateTransform attributeName="transform" dur="3.8s" type="translate" from="1415 0" to="',
+        (1415 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.4s" type="translate" from="1400 0" to="',
+        (1400 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="8.762s" type="translate" from="733 0" to="',
+        (733 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="5.762s" type="translate" from="805 0" to="',
+        (805 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle>'
+      )
+    );
+
+    string memory snowfallForeground2 = string(
+      abi.encodePacked(
+        '<circle r="15.2929"><animateTransform attributeName="transform" dur="3.162s" type="translate" from="900 0" to="',
+        (900 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="9.2s" type="translate" from="1085 0" to="',
+        (1085 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="9.1s" type="translate" from="226 0" to="',
+        (226 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle>'
+      )
+    );
+
+    string memory snowfallForeground3 = string(
+      abi.encodePacked(
+        '<circle r="15.2929"><animateTransform attributeName="transform" dur="4.7s" type="translate" from="1009 0" to="',
+        (1009 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="6.89s" type="translate" from="132 0" to="',
+        (132 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.56s" type="translate" from="97 0" to="',
+        (97 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle></g>'
+      )
+    );
+
+    string memory snowfallBackground0 = string(
+      abi.encodePacked(
+        '<g fill="white" stroke="#ccc" stroke-width="3"><circle r="15.2929"><animateTransform attributeName="transform" dur="8.236s" type="translate" from="504 0" to="',
+        (504 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.982s" type="translate" from="1250 0" to="',
+        (1250 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.249s" type="translate" from="205 0" to="',
+        (205 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" />'
+      )
+    );
+
+    string memory snowfallBackground1 = string(
+      abi.encodePacked(
+        '</circle><circle r="15.2929"><animateTransform attributeName="transform" dur="7.113s" type="translate" from="329 0" to="',
+        (329 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.5s" type="translate" from="167 0" to="',
+        (167 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.5s" type="translate" from="1124 0" to="',
+        (1124 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle>'
+      )
+    );
+
+    string memory snowfallBackground2 = string(
+      abi.encodePacked(
+        '<circle r="15.2929"><animateTransform attributeName="transform" dur="4.782s" type="translate" from="712 0" to="',
+        (712 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="7.201s" type="translate" from="355 0" to="',
+        (355 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle>'
+      )
+    );
+
+    string memory snowfallBackground3 = string(
+      abi.encodePacked(
+        '<circle r="15.2929"><animateTransform attributeName="transform" dur="5.289s" type="translate" from="1204 0" to="',
+        (1204 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="4.892s" type="translate" from="596 0" to="',
+        (596 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle>'
+      )
+    );
+
+    string memory snowfallBackground4 = string(
+      abi.encodePacked(
+        '<circle r="15.2929"><animateTransform attributeName="transform" dur="6.4s" type="translate" from="1216 0" to="',
+        (1216 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle>'
+      )
+    );
+
+    string memory snowfallBackground5 = string(
+      abi.encodePacked(
+        '<circle r="15.2929"><animateTransform attributeName="transform" dur="3.3s" type="translate" from="707 0" to="',
+        (707 + snowman.snowAnimOffsetX).toString(),
+        ' 1000" repeatCount="indefinite" /></circle></g>'
+      )
+    );
+
+    string memory snowfallForeground = string(
+      abi.encodePacked(snowfallForeground0, snowfallForeground1, snowfallForeground2, snowfallForeground3)
+    );
+
+    string memory snowfallBackground = string(
+      abi.encodePacked(
+        snowfallBackground0,
+        snowfallBackground1,
+        snowfallBackground2,
+        snowfallBackground3,
+        snowfallBackground4,
+        snowfallBackground5
+      )
+    );
+
+    return (snowfallForeground, snowfallBackground);
   }
 }
