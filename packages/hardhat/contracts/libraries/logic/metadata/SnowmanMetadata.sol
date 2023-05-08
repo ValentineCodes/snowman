@@ -122,7 +122,7 @@ library SnowmanMetadata {
       );
   }
 
-  function generateSnowfall(DataTypes.Snowman calldata snowman) private view returns (string memory, string memory) {
+  function generateSnowfall(DataTypes.Snowman calldata snowman) private pure returns (string memory, string memory) {
     string memory snowfallForeground0 = string(
       abi.encodePacked(
         '<g fill="white" stroke="#ccc" stroke-width="3"></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.2s" type="translate" from="482 0" to="',

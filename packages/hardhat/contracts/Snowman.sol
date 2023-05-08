@@ -8,6 +8,7 @@ import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
 
 import {ISnowman} from "./interfaces/ISnowman.sol";
 import {IERC721Receiver} from "./interfaces/IERC721Receiver.sol";
+import {Errors} from "./interfaces/Errors.sol";
 
 import {DataTypes} from "./libraries/types/DataTypes.sol";
 import {SnowmanMetadata} from "./libraries/logic/metadata/SnowmanMetadata.sol";
@@ -15,15 +16,6 @@ import {TypeCast} from "./libraries/utils/TypeCast.sol";
 import {ColorGen} from "./libraries/utils/ColorGen.sol";
 import {PRNG} from "./libraries/utils/PRNG.sol";
 import {AccessoryManager} from "./libraries/logic/AccessoryManager.sol";
-
-error Snowman__NotMinted();
-error Snowman__NotEnoughEth();
-error Snowman__TransferFailed();
-error Snowman__ZeroAddress();
-error Snowman__InvalidFeeCollector();
-error Snowman__CannotWearAccessory();
-error Snowman__AccessoryAlreadyWorn();
-error Snowman__NotAccessoryOwner();
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);
@@ -37,7 +29,7 @@ abstract contract Accessory {
  * @notice Mint snowman and compose with other accessories(other NFTs) approved by the admin.
  *         Compose snowman by placing items in the foreground or background of your snowman.☃️
  */
-contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
+contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors {
   using TypeCast for bytes;
   using Counters for Counters.Counter;
 
@@ -60,7 +52,7 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
   }
 
   function mint() public payable returns (uint256) {
-    if (msg.value < MINT_FEE) revert Snowman__NotEnoughEth();
+    if (msg.value < MINT_FEE) revert Errors.Snowman__NotEnoughEth();
 
     s_tokenIds.increment();
 
@@ -87,7 +79,7 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
 
     (bool success, ) = s_feeCollector.call{value: msg.value}("");
 
-    if (!success) revert Snowman__TransferFailed();
+    if (!success) revert Errors.Snowman__TransferFailed();
 
     return tokenId;
   }
@@ -120,7 +112,7 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
   }
 
   function tokenURI(uint256 tokenId) public view override(ERC721, ISnowman) returns (string memory) {
-    if (!_exists(tokenId)) revert Snowman__NotMinted();
+    if (!_exists(tokenId)) revert Errors.Snowman__NotMinted();
 
     return SnowmanMetadata.tokenURI(s_accessories, s_accessoriesById, s_attributes[tokenId], tokenId);
   }
@@ -139,9 +131,9 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
   ) external returns (bytes4) {
     uint256 snowmanId = snowmanIdData.toUint256();
 
-    if (ownerOf(snowmanId) != from) revert Snowman__NotAccessoryOwner();
-    if (s_accessoriesAvailable[msg.sender] == false) revert Snowman__CannotWearAccessory();
-    if (s_accessoriesById[msg.sender][snowmanId] > 0) revert Snowman__AccessoryAlreadyWorn();
+    if (ownerOf(snowmanId) != from) revert Errors.Snowman__NotAccessoryOwner();
+    if (s_accessoriesAvailable[msg.sender] == false) revert Errors.Snowman__CannotWearAccessory();
+    if (s_accessoriesById[msg.sender][snowmanId] > 0) revert Errors.Snowman__AccessoryAlreadyWorn();
 
     s_accessoriesById[msg.sender][snowmanId] = tokenId;
 
@@ -150,8 +142,8 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
 
   function setFeeCollector(address newFeeCollector) public onlyOwner {
     address oldFeeCollector = s_feeCollector;
-    if (newFeeCollector == address(0)) revert Snowman__ZeroAddress();
-    if (newFeeCollector == oldFeeCollector) revert Snowman__InvalidFeeCollector();
+    if (newFeeCollector == address(0)) revert Errors.Snowman__ZeroAddress();
+    if (newFeeCollector == oldFeeCollector) revert Errors.Snowman__InvalidFeeCollector();
 
     s_feeCollector = payable(newFeeCollector);
 

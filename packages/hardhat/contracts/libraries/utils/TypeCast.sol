@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-error toUint256_OutOfBounds();
+error TypeCast__toUint256_OutOfBounds();
 
 library TypeCast {
   bytes16 internal constant ALPHABET = "0123456789abcdef";
@@ -27,7 +27,7 @@ library TypeCast {
   }
 
   function toUint256(bytes memory _bytes) internal pure returns (uint256) {
-    if (_bytes.length < 32) revert toUint256_OutOfBounds();
+    if (_bytes.length < 32) revert TypeCast__toUint256_OutOfBounds();
     uint256 tempUint;
 
     assembly {

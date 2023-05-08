@@ -2,15 +2,9 @@
 pragma solidity ^0.8.17;
 
 import {DataTypes} from "../types/DataTypes.sol";
-import {ISnowman} from "../../interfaces/ISnowman.sol";
 
-error Snowman__AcccessoryAlreadyExists();
-error Snowman__AccessoryNotWorn();
-error Snowman__NotAccessoryOwner();
-error Snowman__NotOwner();
-error Snowman__UnavailableAccessory();
-error Snowman__NoAccessories();
-error Snowman__AccessoriesCountMismatch();
+import {ISnowman} from "../../interfaces/ISnowman.sol";
+import {Errors} from "../../interfaces/Errors.sol";
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);
@@ -25,7 +19,7 @@ library AccessoryManager {
     address accessory,
     DataTypes.AccessoryPosition position
   ) internal {
-    if (s_accessoriesAvailable[accessory]) revert Snowman__AcccessoryAlreadyExists();
+    if (s_accessoriesAvailable[accessory]) revert Errors.Snowman__AcccessoryAlreadyExists();
     s_accessoriesAvailable[accessory] = true;
     s_accessories.push(DataTypes.Accessory(accessory, position));
   }
@@ -39,8 +33,8 @@ library AccessoryManager {
     uint256 totalAccessories = accessories.length;
     uint256 totalPositions = positions.length;
 
-    if (totalAccessories == 0) revert Snowman__NoAccessories();
-    if (totalAccessories != totalPositions) revert Snowman__AccessoriesCountMismatch();
+    if (totalAccessories == 0) revert Errors.Snowman__NoAccessories();
+    if (totalAccessories != totalPositions) revert Errors.Snowman__AccessoriesCountMismatch();
 
     for (uint256 i = 0; i < totalAccessories; i++) {
       addAccessory(s_accessoriesAvailable, s_accessories, accessories[i], positions[i]);
@@ -53,9 +47,9 @@ library AccessoryManager {
     address accessory,
     uint256 snowmanId
   ) public {
-    if (ISnowman(address(this)).ownerOf(snowmanId) != msg.sender) revert Snowman__NotOwner();
+    if (ISnowman(address(this)).ownerOf(snowmanId) != msg.sender) revert Errors.Snowman__NotOwner();
     if (!hasAccessory(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId))
-      revert Snowman__AccessoryNotWorn();
+      revert Errors.Snowman__AccessoryNotWorn();
 
     _removeAccessory(s_accessoriesById, accessory, snowmanId);
   }
@@ -65,7 +59,7 @@ library AccessoryManager {
     mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
     uint256 snowmanId
   ) public {
-    if (msg.sender != ISnowman(address(this)).ownerOf(snowmanId)) revert Snowman__NotAccessoryOwner();
+    if (msg.sender != ISnowman(address(this)).ownerOf(snowmanId)) revert Errors.Snowman__NotAccessoryOwner();
 
     uint256 totalAccessories = accessories.length;
     // remove all accessories from snowman
@@ -96,7 +90,7 @@ library AccessoryManager {
     address accessory,
     uint256 snowmanId
   ) public view returns (bool) {
-    if (!s_accessoriesAvailable[accessory]) revert Snowman__UnavailableAccessory();
+    if (!s_accessoriesAvailable[accessory]) revert Errors.Snowman__UnavailableAccessory();
 
     return (s_accessoriesById[accessory][snowmanId] != 0);
   }
@@ -107,7 +101,7 @@ library AccessoryManager {
     address accessory,
     uint256 snowmanId
   ) public view returns (uint256) {
-    if (!s_accessoriesAvailable[accessory]) revert Snowman__UnavailableAccessory();
+    if (!s_accessoriesAvailable[accessory]) revert Errors.Snowman__UnavailableAccessory();
 
     return s_accessoriesById[accessory][snowmanId];
   }
