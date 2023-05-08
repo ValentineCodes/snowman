@@ -13,6 +13,11 @@ abstract contract Accessory {
 }
 
 library AccessoryManager {
+  event AccessoryAdded(address accessory);
+  event AccessoriesAdded(address[] accessories);
+  event AccessoryRemoved(address accessory);
+  event AccessoriesRemoved(address[] accessories);
+
   function addAccessory(
     mapping(address => bool) storage s_accessoriesAvailable,
     DataTypes.Accessory[] storage s_accessories,
@@ -20,8 +25,11 @@ library AccessoryManager {
     DataTypes.AccessoryPosition position
   ) internal {
     if (s_accessoriesAvailable[accessory]) revert Errors.Snowman__AcccessoryAlreadyExists();
+
     s_accessoriesAvailable[accessory] = true;
     s_accessories.push(DataTypes.Accessory(accessory, position));
+
+    emit AccessoryAdded(accessory);
   }
 
   function addAccessories(
@@ -39,6 +47,8 @@ library AccessoryManager {
     for (uint256 i = 0; i < totalAccessories; i++) {
       addAccessory(s_accessoriesAvailable, s_accessories, accessories[i], positions[i]);
     }
+
+    emit AccessoriesAdded(accessories);
   }
 
   function removeAccessory(

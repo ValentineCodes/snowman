@@ -15,6 +15,7 @@ describe("Snowman☃️", () => {
   let hat: Hat;
   let scarf: Scarf;
   let belt: Belt;
+  let accessories: string[];
 
   beforeEach(async () => {
     const signers: SignerWithAddress[] = await ethers.getSigners();
@@ -28,9 +29,10 @@ describe("Snowman☃️", () => {
     hat = await ethers.getContract("Hat", valentine);
     scarf = await ethers.getContract("Scarf", valentine);
     belt = await ethers.getContract("Belt", valentine);
+    accessories = [hat.address, scarf.address, belt.address];
   });
 
-  describe("💬mint", () => {
+  describe("mint?", () => {
     it("mints one(1) Snowman☃️ with unique attributes for 0.02 ETH💎", async () => {
       // Mint Snowman
       const feeCollector: string = await snowman.getFeeCollector();
@@ -58,18 +60,62 @@ describe("Snowman☃️", () => {
     });
   });
 
-  describe("~addAccessory", () => {
-    it("adds accessory to Snowman", async () => {
+  describe("addAccessory?", () => {
+    it("adds accessory", async () => {
       console.log("Adding hat🎩 accessory...");
       await snowman.connect(owner).addAccessory(hat.address, 1);
 
       expect(await snowman.isAccessoryAvailable(hat.address)).to.be.true;
+      expect((await snowman.getAccessories()).some(accessory => accessory._address === hat.address)).to.be.true;
       console.log("Hat🎩 added✅");
     });
-    it("emits an AccessoryAdded event", async () => {});
+    it("emits an AccessoryAdded event", async () => {
+      await expect(snowman.connect(owner).addAccessory(hat.address, 1))
+        .to.emit(snowman, "AccessoryAdded")
+        .withArgs(hat.address);
+    });
     it("reverts if caller is not owner", async () => {
       await expect(snowman.addAccessory(hat.address, 1)).to.be.revertedWith("Ownable: caller is not the owner");
     });
+    it("reverts if accessory already exists", async () => {
+      await snowman.connect(owner).addAccessory(hat.address, 1);
+      await expect(snowman.connect(owner).addAccessory(hat.address, 1)).to.revertedWithCustomError(
+        snowman,
+        "Snowman__AcccessoryAlreadyExists",
+      );
+    });
+  });
+
+  describe("addAccessories?", () => {
+    it("adds accessories", async () => {
+      console.log("Adding hat🎩, scarf🧣 and belt⑄...");
+      await snowman.connect(owner).addAccessories(accessories, [1, 0, 0]);
+
+      expect(await snowman.isAccessoryAvailable(hat.address)).to.be.true;
+      expect(await snowman.isAccessoryAvailable(scarf.address)).to.be.true;
+      expect(await snowman.isAccessoryAvailable(belt.address)).to.be.true;
+      expect((await snowman.getAccessories()).some(accessory => accessories.includes(accessory._address))).to.be.true;
+    });
+    it("emits an AccessoriesAdded event", async () => {
+      await expect(snowman.connect(owner).addAccessories(accessories, [1, 0, 0]))
+        .to.emit(snowman, "AccessoriesAdded")
+        .withArgs(accessories);
+    });
+    it("reverts if caller is not owner", async () => {
+      await expect(snowman.addAccessories(accessories, [1, 0, 0])).to.be.revertedWith(
+        "Ownable: caller is not the owner",
+      );
+    });
+    it("reverts if accessories length does not match positions length", async () => {
+      await expect(snowman.connect(owner).addAccessories(accessories, [1, 0])).to.be.revertedWithCustomError(
+        snowman,
+        "Snowman__AccessoriesCountMismatch",
+      );
+    });
+  });
+
+  describe("removeAccessory?", () => {
+    it("removes accessory from user's snowman", async () => {});
   });
 
   // describe("generate snowman with accessories", () => {

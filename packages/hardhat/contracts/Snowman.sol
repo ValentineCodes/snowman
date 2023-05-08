@@ -16,6 +16,7 @@ import {TypeCast} from "./libraries/utils/TypeCast.sol";
 import {ColorGen} from "./libraries/utils/ColorGen.sol";
 import {PRNG} from "./libraries/utils/PRNG.sol";
 import {AccessoryManager} from "./libraries/logic/AccessoryManager.sol";
+import {AttributesGen} from "./libraries/logic/AttributesGen.sol";
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);
@@ -59,23 +60,7 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
     uint256 tokenId = s_tokenIds.current();
     _mint(msg.sender, tokenId);
 
-    DataTypes.Snowman memory snowman;
-    string[2] memory colors;
-
-    // generate random cloud and button color
-    for (uint256 i = 0; i < 2; i++) {
-      colors[i] = ColorGen.HSLA(bytes32(i));
-    }
-
-    snowman = DataTypes.Snowman({
-      eyeOffsetX: int256(PRNG.range(0, 19, keccak256("1"))) - 9, // range: -9 - 9
-      eyeOffsetY: int256(PRNG.range(0, 19, keccak256("2"))) - 9, // range: -9 - 9
-      cloudColor: colors[0],
-      buttonColor: colors[1],
-      snowAnimOffsetX: int256(PRNG.range(0, 600)) - 300 // range: -300 - 300
-    });
-
-    s_attributes[tokenId] = snowman;
+    AttributesGen.generateAttributes(s_attributes, tokenId);
 
     (bool success, ) = s_feeCollector.call{value: msg.value}("");
 

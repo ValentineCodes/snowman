@@ -6,6 +6,11 @@ import {DataTypes} from "../libraries/types/DataTypes.sol";
 import {IERC721Enumerable} from "@openzeppelin/contracts/interfaces/IERC721Enumerable.sol";
 
 interface ISnowman is IERC721Enumerable {
+  event AccessoryAdded(address accessory);
+  event AccessoriesAdded(address[] accessories);
+  event AccessoryRemoved(address accessory);
+  event AccessoriesRemoved(address[] accessories);
+
   function mint() external payable returns (uint256);
 
   function addAccessory(address accessory, DataTypes.AccessoryPosition position) external;

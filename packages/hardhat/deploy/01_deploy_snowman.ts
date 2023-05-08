@@ -39,12 +39,16 @@ const deploySnowman: DeployFunction = async function (hre: HardhatRuntimeEnviron
       TokenURIGen: TokenURIGen.address,
     },
   });
+  const attributesGen = await deploy("AttributesGen", {
+    from: deployer,
+  });
 
   await deploy("Snowman", {
     from: deployer,
     args: [deployer],
     log: true,
     libraries: {
+      AttributesGen: attributesGen.address,
       SnowmanMetadata: snowmanMetadata.address,
       AccessoryManager: accessoryManager.address,
     },
