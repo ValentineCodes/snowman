@@ -44,12 +44,12 @@ describe("Snowman☃️", () => {
 
       const newTokenBalance: BigNumber = await snowman.balanceOf(valentine.address);
       expect(newTokenBalance).to.equal(oldTokenBalance.add(1));
-      console.log(`Successfully Minted One(1) Snowman☃️`);
+      console.log(`Mint successful✅`);
 
       const newFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
       expect(newFeeCollectorBalance).to.equal(oldFeeCollectorBalance.add(SNOWMAN_MINT_FEE));
     });
-    it("emits a Transfer event", async () => {
+    it("emits an event", async () => {
       await expect(snowman.mint({ value: SNOWMAN_MINT_FEE })).to.emit(snowman, "Transfer");
     });
     it("reverts if mint fee is not enough", async () => {
@@ -69,7 +69,7 @@ describe("Snowman☃️", () => {
       expect((await snowman.getAccessories()).some(accessory => accessory._address === hat.address)).to.be.true;
       console.log("Hat🎩 added✅");
     });
-    it("emits an AccessoryAdded event", async () => {
+    it("emits an event", async () => {
       await expect(snowman.connect(owner).addAccessory(hat.address, 1))
         .to.emit(snowman, "AccessoryAdded")
         .withArgs(hat.address);
@@ -95,8 +95,9 @@ describe("Snowman☃️", () => {
       expect(await snowman.isAccessoryAvailable(scarf.address)).to.be.true;
       expect(await snowman.isAccessoryAvailable(belt.address)).to.be.true;
       expect((await snowman.getAccessories()).some(accessory => accessories.includes(accessory._address))).to.be.true;
+      console.log("Accessories added✅");
     });
-    it("emits an AccessoriesAdded event", async () => {
+    it("emits an event", async () => {
       await expect(snowman.connect(owner).addAccessories(accessories, [1, 0, 0]))
         .to.emit(snowman, "AccessoriesAdded")
         .withArgs(accessories);
@@ -115,7 +116,52 @@ describe("Snowman☃️", () => {
   });
 
   describe("removeAccessory?", () => {
-    it("removes accessory from user's snowman", async () => {});
+    beforeEach(async () => {
+      await snowman.mint({ value: SNOWMAN_MINT_FEE });
+      await hat.mint({ value: ACCESSORY_MINT_FEE });
+
+      await snowman.connect(owner).addAccessory(hat.address, 1);
+      await snowman.connect(owner).addAccessory(scarf.address, 1);
+
+      const encodedSnowmanId = ethers.utils.defaultAbiCoder.encode(["uint256"], [1]);
+      await hat["safeTransferFrom(address,address,uint256,bytes)"](
+        valentine.address,
+        snowman.address,
+        1,
+        encodedSnowmanId,
+      );
+    });
+
+    it("removes accessory from user's snowman", async () => {
+      console.log("Removing hat🎩...");
+      await expect(snowman.removeAccessory(hat.address, 1)).to.emit(snowman, "AccessoryRemoved").withArgs(hat.address);
+
+      expect(await snowman.getAccessoryById(hat.address, 1)).to.equal(0);
+      console.log("Hat🎩 removed✅");
+    });
+    it("reverts if caller is not snowman owner", async () => {
+      await expect(snowman.connect(owner).removeAccessory(hat.address, 1)).to.be.revertedWithCustomError(
+        snowman,
+        "Snowman__NotOwner",
+      );
+    });
+    it("reverts if accessory is not available", async () => {
+      await expect(snowman.removeAccessory(belt.address, 1)).to.be.revertedWithCustomError(
+        snowman,
+        "Snowman__UnavailableAccessory",
+      );
+    });
+    it("reverts if accessory is not worn", async () => {
+      await expect(snowman.removeAccessory(scarf.address, 1)).to.be.revertedWithCustomError(
+        snowman,
+        "Snowman__AccessoryNotWorn",
+      );
+    });
+    it("transfers accessory back to snowman owner", async () => {
+      await snowman.removeAccessory(hat.address, 1);
+
+      expect(await hat.ownerOf(1)).to.equal(valentine.address);
+    });
   });
 
   // describe("generate snowman with accessories", () => {

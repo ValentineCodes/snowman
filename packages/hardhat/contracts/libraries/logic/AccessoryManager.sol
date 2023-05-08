@@ -92,6 +92,8 @@ library AccessoryManager {
     );
 
     s_accessoriesById[accessory][snowmanId] = 0;
+
+    emit AccessoryRemoved(accessory);
   }
 
   function hasAccessory(
