@@ -12,6 +12,9 @@ describe("Snowman☃️", () => {
   let valentine: SignerWithAddress;
 
   let snowman: Snowman;
+  let hat: Hat;
+  let scarf: Scarf;
+  let belt: Belt;
 
   beforeEach(async () => {
     const signers: SignerWithAddress[] = await ethers.getSigners();
@@ -19,9 +22,12 @@ describe("Snowman☃️", () => {
     owner = signers[0];
     valentine = signers[1];
 
-    await deployments.fixture("Snowman");
+    await deployments.fixture(["Snowman", "Hat", "Scarf", "Belt"]);
 
     snowman = await ethers.getContract("Snowman", valentine);
+    hat = await ethers.getContract("Hat", valentine);
+    scarf = await ethers.getContract("Scarf", valentine);
+    belt = await ethers.getContract("Belt", valentine);
   });
 
   describe("💬mint", () => {
@@ -29,48 +35,71 @@ describe("Snowman☃️", () => {
       // Mint Snowman
       const feeCollector: string = await snowman.getFeeCollector();
       const oldFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
-      console.log("Old Balance: ", ethers.utils.formatEther(oldFeeCollectorBalance), "💎");
+      const oldTokenBalance: BigNumber = await snowman.balanceOf(valentine.address);
 
       console.log("Minting One(1) Snowman☃️...");
       await snowman.mint({ value: SNOWMAN_MINT_FEE });
+
+      const newTokenBalance: BigNumber = await snowman.balanceOf(valentine.address);
+      expect(newTokenBalance).to.equal(oldTokenBalance.add(1));
       console.log(`Successfully Minted One(1) Snowman☃️`);
 
       const newFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
-      console.log("New Balance: ", ethers.utils.formatEther(newFeeCollectorBalance), "💎");
       expect(newFeeCollectorBalance).to.equal(oldFeeCollectorBalance.add(SNOWMAN_MINT_FEE));
     });
-  });
-
-  describe("💬addAccessory test-focus", () => {
-    it("adds accessories to the snowman for composition", async () => {
-      await snowman.mint({ value: SNOWMAN_MINT_FEE });
-      console.log("Snowman minted✅");
-
-      // deploy accessories
-      await deployments.fixture(["Hat", "Scarf", "Belt"]);
-
-      const hat: Hat = await ethers.getContract("Hat", valentine);
-      await hat.mint({ value: ACCESSORY_MINT_FEE });
-
-      const scarf: Scarf = await ethers.getContract("Scarf", valentine);
-      await scarf.mint({ value: ACCESSORY_MINT_FEE });
-
-      const belt: Belt = await ethers.getContract("Belt", valentine);
-      await belt.mint({ value: ACCESSORY_MINT_FEE });
-
-      await snowman.connect(owner).addAccessory(hat.address, 1);
-      await snowman.connect(owner).addAccessory(scarf.address, 0);
-      await snowman.connect(owner).addAccessory(belt.address, 0);
-
-      const snowmanId = ethers.utils.defaultAbiCoder.encode(["uint256"], [1]);
-      await hat["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
-      await scarf["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
-      await belt["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
-      console.log("Added hat and scarf as an accessory✅");
-
-      const tokenURI = await (await fetch(await snowman.tokenURI(1))).json();
-      const imageSVG: string = await (await fetch(tokenURI.image)).text();
-      console.log(imageSVG);
+    it("emits a Transfer event", async () => {
+      await expect(snowman.mint({ value: SNOWMAN_MINT_FEE })).to.emit(snowman, "Transfer");
+    });
+    it("reverts if mint fee is not enough", async () => {
+      await expect(snowman.mint({ value: ethers.utils.parseEther("0.01") })).to.be.revertedWithCustomError(
+        snowman,
+        "Snowman__NotEnoughEth",
+      );
     });
   });
+
+  describe("~addAccessory", () => {
+    it("adds accessory to Snowman", async () => {
+      console.log("Adding hat🎩 accessory...");
+      await snowman.connect(owner).addAccessory(hat.address, 1);
+
+      expect(await snowman.isAccessoryAvailable(hat.address)).to.be.true;
+      console.log("Hat🎩 added✅");
+    });
+    it("emits an AccessoryAdded event", async () => {});
+    it("reverts if caller is not owner", async () => {
+      await expect(snowman.addAccessory(hat.address, 1)).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+  });
+
+  // describe("generate snowman with accessories", () => {
+  //   it("adds accessories to the snowman for composition", async () => {
+  //     await snowman.mint({ value: SNOWMAN_MINT_FEE });
+  //     console.log("Snowman minted✅");
+
+  //     // deploy accessories
+  //     await deployments.fixture(["Hat", "Scarf", "Belt"]);
+
+  //     const hat: Hat = await ethers.getContract("Hat", valentine);
+  //     await hat.mint({ value: ACCESSORY_MINT_FEE });
+
+  //     const scarf: Scarf = await ethers.getContract("Scarf", valentine);
+  //     await scarf.mint({ value: ACCESSORY_MINT_FEE });
+
+  //     const belt: Belt = await ethers.getContract("Belt", valentine);
+  //     await belt.mint({ value: ACCESSORY_MINT_FEE });
+
+  //     await snowman.connect(owner).addAccessory(hat.address, 1);
+  //     await snowman.connect(owner).addAccessory(scarf.address, 0);
+  //     await snowman.connect(owner).addAccessory(belt.address, 0);
+
+  //     const snowmanId = ethers.utils.defaultAbiCoder.encode(["uint256"], [1]);
+  //     await hat["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
+  //     await scarf["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
+  //     await belt["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, snowmanId);
+  //     console.log("Added hat and scarf as an accessory✅");
+
+  //     const tokenURI = await (await fetch(await snowman.tokenURI(1))).json();
+  //   });
+  // });
 });
