@@ -4,14 +4,7 @@ pragma solidity ^0.8.17;
 import {DataTypes} from "../types/DataTypes.sol";
 import {ISnowman} from "../../interfaces/ISnowman.sol";
 
-error Snowman__NotMinted();
-error Snowman__NotEnoughEth();
-error Snowman__TransferFailed();
-error Snowman__ZeroAddress();
-error Snowman__InvalidFeeCollector();
 error Snowman__AcccessoryAlreadyExists();
-error Snowman__CannotWearAccessory();
-error Snowman__AccessoryAlreadyWorn();
 error Snowman__AccessoryNotWorn();
 error Snowman__NotAccessoryOwner();
 error Snowman__NotOwner();

@@ -3,7 +3,6 @@ pragma solidity ^0.8.17;
 
 import {Strings} from "../../../dependencies/Strings.sol";
 import {Base64} from "base64-sol/base64.sol";
-import {console} from "hardhat/console.sol";
 
 import {DataTypes} from "../../types/DataTypes.sol";
 import {TokenURIGen} from "../../utils/TokenURIGen.sol";
@@ -36,15 +35,15 @@ library SnowmanMetadata {
     string memory face = string(
       abi.encodePacked(
         '<path d="M936 394C936 463.274 868.961 520 785.5 520C702.039 520 635 463.274 635 394C635 324.726 702.039 268 785.5 268C868.961 268 936 324.726 936 394Z" fill="white" stroke="#ccc" stroke-width="4" /> <path d="M759.13 336.817C759.13 349.926 747.955 360.635 734.065 360.635C720.175 360.635 709 349.926 709 336.817C709 323.709 720.175 313 734.065 313C747.955 313 759.13 323.709 759.13 336.817Z" fill="#F9F8F8" stroke="black" stroke-width="2" /> <path d="M863.389 336.817C863.389 349.926 852.214 360.635 838.324 360.635C824.435 360.635 813.259 349.926 813.259 336.817C813.259 323.709 824.435 313 838.324 313C852.214 313 863.389 323.709 863.389 336.817Z" fill="white" stroke="black" stroke-width="2" />',
-        '<ellipse cx="733.599" cy="',
-        snowman.eyePosY.toString(),
-        '" rx="16.2906" ry="14.5159" fill="#0D0D0D" /> <ellipse cx="837.859" cy="',
-        snowman.eyePosY.toString(),
-        '" rx="16.2906" ry="14.5159" fill="#0F0F0F" /> <ellipse cx="843.91" cy="',
-        (snowman.eyePosY + 1).toString(),
-        '" rx="5.58533" ry="5.15079" fill="#FFFBFB" /><ellipse cx="739.65" cy="',
-        (snowman.eyePosY + 1).toString(),
-        '" rx="5.58533" ry="5.15079" fill="#FEFEFE" /> <path d="M727.53 426.093C717.139 429.791 715.725 433.162 722.28 441.842" stroke="black" stroke-width="3" /> <path d="M844 430.671C855.087 437.025 855.507 441.01 848.695 448.669" stroke="black" stroke-width="3" /> <path d="M733 434C770.692 452.514 802.237 455.433 838 434" stroke="black" stroke-width="5" /> <path d="M878.688 393.576C880.355 393.878 881.964 394.163 883.507 394.429L772.637 411.249C769.048 403.006 769.05 392.909 770.132 384.422C770.703 379.946 771.56 376.023 772.275 373.22C772.496 372.352 772.703 371.594 772.883 370.961C773.706 371.151 774.739 371.388 775.96 371.668C779.37 372.451 784.25 373.565 790.13 374.894C801.889 377.551 817.651 381.065 833.658 384.492C849.66 387.918 865.927 391.262 878.688 393.576Z" fill="#D98A2C" stroke="black" stroke-width="5" /> <path d="M837.236 296.02C857.236 296.02 865.236 296.02 880.984 320.452" stroke="black" stroke-width="8" /> <path d="M724.736 296.316C704.25 300.449 694.485 304.94 686.236 324.52" stroke="black" stroke-width="8" />'
+        '<ellipse rx="16.2906" ry="14.5159" fill="#0D0D0D" transform="translate(',
+        (733 + snowman.eyeOffsetX).toString(),
+        ",",
+        (337 + snowman.eyeOffsetY).toString(),
+        ')" /><ellipse rx="16.2906" ry="14.5159" fill="#0F0F0F" transform="translate(',
+        (838 + snowman.eyeOffsetX).toString(),
+        ",",
+        (337 + snowman.eyeOffsetY).toString(),
+        ')" /> <path d="M727.53 426.093C717.139 429.791 715.725 433.162 722.28 441.842" stroke="black" stroke-width="3" /> <path d="M844 430.671C855.087 437.025 855.507 441.01 848.695 448.669" stroke="black" stroke-width="3" /> <path d="M733 434C770.692 452.514 802.237 455.433 838 434" stroke="black" stroke-width="5" /> <path d="M878.688 393.576C880.355 393.878 881.964 394.163 883.507 394.429L772.637 411.249C769.048 403.006 769.05 392.909 770.132 384.422C770.703 379.946 771.56 376.023 772.275 373.22C772.496 372.352 772.703 371.594 772.883 370.961C773.706 371.151 774.739 371.388 775.96 371.668C779.37 372.451 784.25 373.565 790.13 374.894C801.889 377.551 817.651 381.065 833.658 384.492C849.66 387.918 865.927 391.262 878.688 393.576Z" fill="#D98A2C" stroke="black" stroke-width="5" /> <path d="M837.236 296.02C857.236 296.02 865.236 296.02 880.984 320.452" stroke="black" stroke-width="8" /> <path d="M724.736 296.316C704.25 300.449 694.485 304.94 686.236 324.52" stroke="black" stroke-width="8" />'
       )
     );
 
@@ -124,7 +123,6 @@ library SnowmanMetadata {
   }
 
   function generateSnowfall(DataTypes.Snowman calldata snowman) private view returns (string memory, string memory) {
-    console.logInt(snowman.snowAnimOffsetX);
     string memory snowfallForeground0 = string(
       abi.encodePacked(
         '<g fill="white" stroke="#ccc" stroke-width="3"></circle><circle r="15.2929"><animateTransform attributeName="transform" dur="3.2s" type="translate" from="482 0" to="',

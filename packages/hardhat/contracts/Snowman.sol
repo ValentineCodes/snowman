@@ -21,15 +21,9 @@ error Snowman__NotEnoughEth();
 error Snowman__TransferFailed();
 error Snowman__ZeroAddress();
 error Snowman__InvalidFeeCollector();
-error Snowman__AcccessoryAlreadyExists();
 error Snowman__CannotWearAccessory();
 error Snowman__AccessoryAlreadyWorn();
-error Snowman__AccessoryNotWorn();
 error Snowman__NotAccessoryOwner();
-error Snowman__NotOwner();
-error Snowman__UnavailableAccessory();
-error Snowman__NoAccessories();
-error Snowman__AccessoriesCountMismatch();
 
 abstract contract Accessory {
   function renderTokenById(uint256 id) external view virtual returns (string memory);
@@ -82,10 +76,11 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable {
     }
 
     snowman = DataTypes.Snowman({
-      eyePosY: PRNG.range(328, 347),
+      eyeOffsetX: int256(PRNG.range(0, 19, keccak256("1"))) - 9, // range: -9 - 9
+      eyeOffsetY: int256(PRNG.range(0, 19, keccak256("2"))) - 9, // range: -9 - 9
       cloudColor: colors[0],
       buttonColor: colors[1],
-      snowAnimOffsetX: int256((PRNG.randomNumber() % 601) - 300)
+      snowAnimOffsetX: int256(PRNG.range(0, 600)) - 300 // range: -300 - 300
     });
 
     s_attributes[tokenId] = snowman;
