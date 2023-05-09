@@ -69,6 +69,16 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
     return tokenId;
   }
 
+  function setFeeCollector(address newFeeCollector) public onlyOwner {
+    address oldFeeCollector = s_feeCollector;
+    if (newFeeCollector == address(0)) revert Errors.Snowman__ZeroAddress();
+    if (newFeeCollector == oldFeeCollector) revert Errors.Snowman__InvalidFeeCollector();
+
+    s_feeCollector = payable(newFeeCollector);
+
+    emit FeeCollectorChanged(oldFeeCollector, newFeeCollector);
+  }
+
   function addAccessory(address accessory, DataTypes.AccessoryPosition position) public onlyOwner {
     AccessoryManager.addAccessory(s_accessoriesAvailable, s_accessories, accessory, position);
   }
@@ -88,12 +98,21 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
     AccessoryManager.removeAllAccessories(s_accessories, s_accessoriesById, snowmanId);
   }
 
-  function hasAccessory(address accessory, uint256 snowmanId) public view returns (bool) {
-    return AccessoryManager.hasAccessory(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId);
-  }
+  function onERC721Received(
+    address operator,
+    address from,
+    uint256 tokenId,
+    bytes calldata snowmanIdData
+  ) external returns (bytes4) {
+    uint256 snowmanId = snowmanIdData.toUint256();
 
-  function accessoryId(address accessory, uint256 snowmanId) external view returns (uint256) {
-    return AccessoryManager.accessoryId(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId);
+    if (ownerOf(snowmanId) != from) revert Errors.Snowman__NotOwner();
+    if (s_accessoriesAvailable[msg.sender] == false) revert Errors.Snowman__CannotWearAccessory();
+    if (s_accessoriesById[msg.sender][snowmanId] > 0) revert Errors.Snowman__AccessoryAlreadyWorn();
+
+    s_accessoriesById[msg.sender][snowmanId] = tokenId;
+
+    return this.onERC721Received.selector;
   }
 
   function tokenURI(uint256 tokenId) public view override(ERC721, ISnowman) returns (string memory) {
@@ -106,33 +125,6 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
     DataTypes.Snowman memory snowman = s_attributes[tokenId];
 
     return SnowmanMetadata.renderTokenById(s_accessories, s_accessoriesById, snowman, tokenId);
-  }
-
-  function onERC721Received(
-    address operator,
-    address from,
-    uint256 tokenId,
-    bytes calldata snowmanIdData
-  ) external returns (bytes4) {
-    uint256 snowmanId = snowmanIdData.toUint256();
-
-    if (ownerOf(snowmanId) != from) revert Errors.Snowman__NotAccessoryOwner();
-    if (s_accessoriesAvailable[msg.sender] == false) revert Errors.Snowman__CannotWearAccessory();
-    if (s_accessoriesById[msg.sender][snowmanId] > 0) revert Errors.Snowman__AccessoryAlreadyWorn();
-
-    s_accessoriesById[msg.sender][snowmanId] = tokenId;
-
-    return this.onERC721Received.selector;
-  }
-
-  function setFeeCollector(address newFeeCollector) public onlyOwner {
-    address oldFeeCollector = s_feeCollector;
-    if (newFeeCollector == address(0)) revert Errors.Snowman__ZeroAddress();
-    if (newFeeCollector == oldFeeCollector) revert Errors.Snowman__InvalidFeeCollector();
-
-    s_feeCollector = payable(newFeeCollector);
-
-    emit FeeCollectorChanged(oldFeeCollector, newFeeCollector);
   }
 
   function getFeeCollector() public view returns (address) {
@@ -149,5 +141,13 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
 
   function isAccessoryAvailable(address accessory) public view returns (bool) {
     return s_accessoriesAvailable[accessory];
+  }
+
+  function hasAccessory(address accessory, uint256 snowmanId) public view returns (bool) {
+    return AccessoryManager.hasAccessory(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId);
+  }
+
+  function accessoryId(address accessory, uint256 snowmanId) external view returns (uint256) {
+    return AccessoryManager.accessoryId(s_accessoriesAvailable, s_accessoriesById, accessory, snowmanId);
   }
 }

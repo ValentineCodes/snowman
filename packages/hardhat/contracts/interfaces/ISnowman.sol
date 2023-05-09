@@ -9,7 +9,7 @@ interface ISnowman is IERC721Enumerable {
   event AccessoryAdded(address accessory);
   event AccessoriesAdded(address[] accessories);
   event AccessoryRemoved(address accessory);
-  event AccessoriesRemoved(address[] accessories);
+  event AccessoriesRemoved(DataTypes.Accessory[] accessories);
 
   function mint() external payable returns (uint256);
 

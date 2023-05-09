@@ -16,7 +16,7 @@ library AccessoryManager {
   event AccessoryAdded(address accessory);
   event AccessoriesAdded(address[] accessories);
   event AccessoryRemoved(address accessory);
-  event AccessoriesRemoved(address[] accessories);
+  event AccessoriesRemoved(DataTypes.Accessory[] accessories);
 
   function addAccessory(
     mapping(address => bool) storage s_accessoriesAvailable,
@@ -62,6 +62,8 @@ library AccessoryManager {
       revert Errors.Snowman__AccessoryNotWorn();
 
     _removeAccessory(s_accessoriesById, accessory, snowmanId);
+
+    emit AccessoryRemoved(accessory);
   }
 
   function removeAllAccessories(
@@ -69,7 +71,7 @@ library AccessoryManager {
     mapping(address => mapping(uint256 => uint256)) storage s_accessoriesById,
     uint256 snowmanId
   ) public {
-    if (msg.sender != ISnowman(address(this)).ownerOf(snowmanId)) revert Errors.Snowman__NotAccessoryOwner();
+    if (msg.sender != ISnowman(address(this)).ownerOf(snowmanId)) revert Errors.Snowman__NotOwner();
 
     uint256 totalAccessories = accessories.length;
     // remove all accessories from snowman
@@ -78,6 +80,8 @@ library AccessoryManager {
         _removeAccessory(s_accessoriesById, accessories[i]._address, snowmanId);
       }
     }
+
+    emit AccessoriesRemoved(accessories);
   }
 
   function _removeAccessory(
@@ -92,8 +96,6 @@ library AccessoryManager {
     );
 
     s_accessoriesById[accessory][snowmanId] = 0;
-
-    emit AccessoryRemoved(accessory);
   }
 
   function hasAccessory(
