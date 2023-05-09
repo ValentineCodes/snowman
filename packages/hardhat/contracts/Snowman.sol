@@ -53,7 +53,7 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
   }
 
   function mint() public payable returns (uint256) {
-    if (msg.value < MINT_FEE) revert Errors.Snowman__NotEnoughEth();
+    if (msg.value != MINT_FEE) revert Errors.Snowman__InvalidMintFee();
 
     s_tokenIds.increment();
 

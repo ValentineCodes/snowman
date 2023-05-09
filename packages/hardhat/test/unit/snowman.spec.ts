@@ -55,7 +55,7 @@ describe("Snowman☃️", () => {
     it("reverts if mint fee is not enough", async () => {
       await expect(snowman.mint({ value: ethers.utils.parseEther("0.01") })).to.be.revertedWithCustomError(
         snowman,
-        "Snowman__NotEnoughEth",
+        "Snowman__InvalidMintFee",
       );
     });
   });

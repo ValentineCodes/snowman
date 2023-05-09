@@ -13,7 +13,7 @@ import {TypeCast} from "../libraries/utils/TypeCast.sol";
 import {ColorGen} from "../libraries/utils/ColorGen.sol";
 
 error Hat__NotMinted();
-error Hat__NotEnoughEth();
+error Hat__InvalidMintFee();
 error Hat__TransferFailed();
 error Hat__ZeroAddress();
 error Hat__InvalidFeeCollector();
@@ -36,7 +36,7 @@ contract Hat is ERC721, Ownable {
   }
 
   function mint() public payable returns (uint256) {
-    if (msg.value < MINT_FEE) revert Hat__NotEnoughEth();
+    if (msg.value < MINT_FEE) revert Hat__InvalidMintFee();
 
     s_tokenIds.increment();
 

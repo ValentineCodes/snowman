@@ -13,7 +13,7 @@ import {TypeCast} from "../libraries/utils/TypeCast.sol";
 import {ColorGen} from "../libraries/utils/ColorGen.sol";
 
 error Scarf__NotMinted();
-error Scarf__NotEnoughEth();
+error Scarf__InvalidMintFee();
 error Scarf__TransferFailed();
 error Scarf__ZeroAddress();
 error Scarf__InvalidFeeCollector();
@@ -36,7 +36,7 @@ contract Scarf is ERC721, Ownable {
   }
 
   function mint() public payable returns (uint256) {
-    if (msg.value < MINT_FEE) revert Scarf__NotEnoughEth();
+    if (msg.value < MINT_FEE) revert Scarf__InvalidMintFee();
 
     s_tokenIds.increment();
 

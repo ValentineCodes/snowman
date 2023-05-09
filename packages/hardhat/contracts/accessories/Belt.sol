@@ -13,7 +13,7 @@ import {TypeCast} from "../libraries/utils/TypeCast.sol";
 import {ColorGen} from "../libraries/utils/ColorGen.sol";
 
 error Belt__NotMinted();
-error Belt__NotEnoughEth();
+error Belt__InvalidMintFee();
 error Belt__TransferFailed();
 error Belt__ZeroAddress();
 error Belt__InvalidFeeCollector();
@@ -36,7 +36,7 @@ contract Belt is ERC721, Ownable {
   }
 
   function mint() public payable returns (uint256) {
-    if (msg.value < MINT_FEE) revert Belt__NotEnoughEth();
+    if (msg.value != MINT_FEE) revert Belt__InvalidMintFee();
 
     s_tokenIds.increment();
 
