@@ -139,10 +139,6 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
     return s_feeCollector;
   }
 
-  function getAttributes(uint256 tokenId) public view returns (DataTypes.Snowman memory) {
-    return s_attributes[tokenId];
-  }
-
   function getAccessories() public view returns (DataTypes.Accessory[] memory) {
     return s_accessories;
   }

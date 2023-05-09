@@ -31,8 +31,6 @@ interface ISnowman is IERC721Enumerable {
 
   function getFeeCollector() external view returns (address);
 
-  function getAttributes(uint256 tokenId) external view returns (DataTypes.Snowman memory);
-
   function getAccessories() external view returns (DataTypes.Accessory[] memory);
 
   function isAccessoryAvailable(address accessory) external view returns (bool);
