@@ -49,7 +49,7 @@ const contracts = {
             },
             {
               inputs: [],
-              name: "Snowman__NotEnoughEth",
+              name: "Snowman__InvalidMintFee",
               type: "error",
             },
             {
