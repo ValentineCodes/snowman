@@ -258,5 +258,8 @@ describe("Snowman☃️", () => {
       const newFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
       expect(newFeeCollectorBalance).to.equal(oldFeeCollectorBalance.add(SNOWMAN_MINT_FEE));
     });
+    it("prevents redundant withdraws", async () => {
+      await expect(snowman.withdrawFees()).to.be.revertedWithCustomError(snowman, "Snowman__NoFeesAvailable");
+    });
   });
 });
