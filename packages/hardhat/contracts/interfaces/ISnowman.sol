@@ -6,10 +6,29 @@ import {DataTypes} from "../libraries/types/DataTypes.sol";
 import {IERC721Enumerable} from "@openzeppelin/contracts/interfaces/IERC721Enumerable.sol";
 
 interface ISnowman is IERC721Enumerable {
+  /**
+   *
+   * @notice Emitted when an accessory has been added
+   * @dev Accessory can only be added by contract owner
+   * @param accessory Address of accessory
+   */
   event AccessoryAdded(address accessory);
+
+  /**
+   *
+   * @notice Emitted when multiple accessories have been added
+   * @dev Accessories can only be added by contract owner
+   * @param accessories Address of accessories
+   */
   event AccessoriesAdded(address[] accessories);
-  event AccessoryRemoved(address accessory);
-  event AccessoriesRemoved(DataTypes.Accessory[] accessories);
+  /**
+   *
+   * @notice Emitted when an accessory is removed from
+   * @dev Accessory can only be added by contract owner
+   * @param accessory Address of accessory
+   */
+  event AccessoryRemoved(address accessory, uint256 snowmanId);
+  event AccessoriesRemoved(DataTypes.Accessory[] accessories, uint256 snowmanId);
 
   function mint() external payable returns (uint256);
 

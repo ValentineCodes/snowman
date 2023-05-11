@@ -134,7 +134,9 @@ describe("Snowman☃️", () => {
 
     it("removes accessory from user's snowman and emits an event", async () => {
       console.log("Removing hat🎩...");
-      await expect(snowman.removeAccessory(hat.address, 1)).to.emit(snowman, "AccessoryRemoved").withArgs(hat.address);
+      await expect(snowman.removeAccessory(hat.address, 1))
+        .to.emit(snowman, "AccessoryRemoved")
+        .withArgs(hat.address, 1);
 
       expect(await snowman.getAccessoryById(hat.address, 1)).to.equal(0);
       console.log("Hat🎩 removed✅");

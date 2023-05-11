@@ -15,8 +15,8 @@ abstract contract Accessory {
 library AccessoryManager {
   event AccessoryAdded(address accessory);
   event AccessoriesAdded(address[] accessories);
-  event AccessoryRemoved(address accessory);
-  event AccessoriesRemoved(DataTypes.Accessory[] accessories);
+  event AccessoryRemoved(address accessory, uint256 snowmanId);
+  event AccessoriesRemoved(DataTypes.Accessory[] accessories, uint256 snowmanId);
 
   function addAccessory(
     mapping(address => bool) storage s_accessoriesAvailable,
@@ -63,7 +63,7 @@ library AccessoryManager {
 
     _removeAccessory(s_accessoriesById, accessory, snowmanId);
 
-    emit AccessoryRemoved(accessory);
+    emit AccessoryRemoved(accessory, snowmanId);
   }
 
   function removeAllAccessories(
@@ -81,7 +81,7 @@ library AccessoryManager {
       }
     }
 
-    emit AccessoriesRemoved(accessories);
+    emit AccessoriesRemoved(accessories, snowmanId);
   }
 
   function _removeAccessory(
