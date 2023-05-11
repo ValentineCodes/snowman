@@ -35,8 +35,6 @@ describe("Snowman☃️", () => {
   describe("mint()", () => {
     it("mints one(1) Snowman☃️ with unique attributes for 0.02 ETH💎", async () => {
       // Mint Snowman
-      const feeCollector: string = await snowman.getFeeCollector();
-      const oldFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
       const oldTokenBalance: BigNumber = await snowman.balanceOf(valentine.address);
 
       console.log("Minting One(1) Snowman☃️...");
@@ -45,9 +43,6 @@ describe("Snowman☃️", () => {
       const newTokenBalance: BigNumber = await snowman.balanceOf(valentine.address);
       expect(newTokenBalance).to.equal(oldTokenBalance.add(1));
       console.log(`Mint successful✅`);
-
-      const newFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
-      expect(newFeeCollectorBalance).to.equal(oldFeeCollectorBalance.add(SNOWMAN_MINT_FEE));
     });
     it("emits an event", async () => {
       await expect(snowman.mint({ value: SNOWMAN_MINT_FEE })).to.emit(snowman, "Transfer");
@@ -248,6 +243,20 @@ describe("Snowman☃️", () => {
       await expect(
         hat["safeTransferFrom(address,address,uint256,bytes)"](valentine.address, snowman.address, 1, encodedSnowmanId),
       ).to.be.revertedWithCustomError(snowman, "Snowman__CannotWearAccessory");
+    });
+  });
+
+  describe("withdrawFees()", () => {
+    it("transfers fees to fee collector", async () => {
+      await snowman.mint({ value: SNOWMAN_MINT_FEE });
+
+      const feeCollector: string = await snowman.getFeeCollector();
+      const oldFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
+
+      await snowman.withdrawFees();
+
+      const newFeeCollectorBalance: BigNumber = await ethers.provider.getBalance(feeCollector);
+      expect(newFeeCollectorBalance).to.equal(oldFeeCollectorBalance.add(SNOWMAN_MINT_FEE));
     });
   });
 });

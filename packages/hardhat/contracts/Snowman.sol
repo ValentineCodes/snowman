@@ -62,10 +62,6 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
 
     AttributesGen.generateAttributes(s_attributes, tokenId);
 
-    (bool success, ) = s_feeCollector.call{value: msg.value}("");
-
-    if (!success) revert Errors.Snowman__TransferFailed();
-
     return tokenId;
   }
 
@@ -113,6 +109,14 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
     s_accessoriesById[msg.sender][snowmanId] = tokenId;
 
     return this.onERC721Received.selector;
+  }
+
+  function withdrawFees() external override {
+    if (address(this).balance == 0) revert Errors.Snowman__NoFeesAvailable();
+
+    (bool success, ) = s_feeCollector.call{value: address(this).balance}("");
+
+    if (!success) revert Errors.Snowman__WithdrawalFailed();
   }
 
   function tokenURI(uint256 tokenId) public view override(ERC721, ISnowman) returns (string memory) {
