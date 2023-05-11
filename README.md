@@ -12,7 +12,7 @@
 
 A user can mint a Snowman for 0.02 ETH. Then mint other accessories(NFTs). If the accessory has been allowed by the Snowman contract owner to be used for composition, the accessory can be transferred using `safeTransferFrom` to the Snowman NFT contract which triggers the `onERC721Received` function which then adds the accessory to the accessory owner's Snowman specified in the `bytes` param of the `safeTransferFrom` function. The `tokenURI` and the `renderTokenById` functions will then return the Snowman with it's accessories. Accessories can be removed by users at any time using the `removeAccessory` or `removeAllAccessories` functions.
 
-`✍️Note: Users are allowed to create an accessory which will be added to the snowman if suitable... It's Christmas! A Christmas Tree🎄 would be nice, wouldn't it?🙂`
+`✍️Note: Users are allowed to create an accessory which will be added to the snowman if suitable... A Christmas Tree🎄 would be nice, wouldn't it?🙂`
 
 # Local Development
 
