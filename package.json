@@ -1,5 +1,5 @@
 {
-  "name": "se-2",
+  "name": "snowman",
   "version": "0.0.1",
   "private": true,
   "workspaces": {
@@ -9,28 +9,31 @@
     ]
   },
   "scripts": {
-    "account": "yarn workspace @se-2/hardhat account",
-    "chain": "yarn workspace @se-2/hardhat chain",
-    "fork": "yarn workspace @se-2/hardhat fork",
-    "deploy": "yarn workspace @se-2/hardhat deploy",
-    "verify": "yarn workspace @se-2/hardhat verify",
-    "compile": "yarn workspace @se-2/hardhat compile",
-    "generate": "yarn workspace @se-2/hardhat generate",
-    "hardhat:lint": "yarn workspace @se-2/hardhat lint",
-    "hardhat:lint-staged": "yarn workspace @se-2/hardhat lint-staged",
-    "test": "yarn workspace @se-2/hardhat test",
-    "start": "yarn workspace @se-2/nextjs dev",
-    "next:lint": "yarn workspace @se-2/nextjs lint",
-    "next:format": "yarn workspace @se-2/nextjs format",
-    "next:check-types": "yarn workspace @se-2/nextjs check-types",
+    "account": "yarn workspace @snowman/hardhat account",
+    "chain": "yarn workspace @snowman/hardhat chain",
+    "fork": "yarn workspace @snowman/hardhat fork",
+    "deploy": "yarn workspace @snowman/hardhat deploy",
+    "verify": "yarn workspace @snowman/hardhat verify",
+    "compile": "yarn workspace @snowman/hardhat compile",
+    "generate": "yarn workspace @snowman/hardhat generate",
+    "hardhat:lint": "yarn workspace @snowman/hardhat lint",
+    "hardhat:lint-staged": "yarn workspace @snowman/hardhat lint-staged",
+    "test": "yarn workspace @snowman/hardhat test",
+    "start": "yarn workspace @snowman/nextjs dev",
+    "next:lint": "yarn workspace @snowman/nextjs lint",
+    "next:format": "yarn workspace @snowman/nextjs format",
+    "next:check-types": "yarn workspace @snowman/nextjs check-types",
     "postinstall": "husky install",
     "precommit": "lint-staged",
-    "vercel": "yarn workspace @se-2/nextjs vercel",
-    "vercel:yolo": "yarn workspace @se-2/nextjs vercel:yolo"
+    "vercel": "yarn workspace @snowman/nextjs vercel",
+    "vercel:yolo": "yarn workspace @snowman/nextjs vercel:yolo"
   },
   "packageManager": "yarn@3.2.3",
   "devDependencies": {
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3"
+  },
+  "dependencies": {
+    "typewriter-effect": "^2.19.0"
   }
 }
