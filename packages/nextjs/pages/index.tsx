@@ -35,6 +35,8 @@ const Home: NextPage = () => {
     onSuccess: () => {
       if(balance) {
         setBalance(balance => balance + 1)
+      } else {
+        setBalance(1)
       }
     }
   })
@@ -58,12 +60,7 @@ const Home: NextPage = () => {
       <p className="text-md md:text-xl -mt-2 text-center max-w-lg">Mint a unique Snowman☃️ for 0.02 ETH and compose with a bunch of <Link href="/" className="underline transition duration-300 text-orange-300 hover:text-orange-500 font-bold">accessories</Link>🎩🧣</p>
       <button className="border-orange-500 bg-orange-500 hover:border-black hover:bg-white hover:text-black transition-all px-4 py-2 text-white rounded-md shadow-lg" onClick={mint} disabled={isMinting}>{isMinting? <Spinner size="md" thickness='4px' speed='0.65s' />: "Mint One"}</button>
 
-{balance !== undefined? (
-  <>
-        <p className="text-xl">You own <strong>{balance}</strong> Snowman</p>
-      <SnowmanList balance={balance} />
-      </>
-): <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />}
+      {balance !== undefined? (<SnowmanList balance={balance} />): <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />}
 
     </main>
     </>
