@@ -1,6 +1,6 @@
 /// SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.18;
 
 import {ERC721Enumerable, ERC721} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -27,8 +27,7 @@ abstract contract Accessory {
 /**
  * @title Snowman⛄️ - ERC4883 Composable Snowman NFT
  * @author Valentine Orga
- * @notice Mint snowman and compose with other accessories(other NFTs) approved by the admin.
- *         Compose snowman by placing items in the foreground or background of your snowman.☃️
+ * @notice Mint a unique snowman and compose with other accessories(NFTs) approved by the admin.
  */
 contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors {
   using TypeCast for bytes;
@@ -40,13 +39,12 @@ contract Snowman is ISnowman, ERC721Enumerable, IERC721Receiver, Ownable, Errors
   address payable s_feeCollector;
   Counters.Counter private s_tokenIds;
 
-  mapping(uint256 => DataTypes.Snowman) private s_attributes;
+  mapping(uint256 snowmanId => DataTypes.Snowman snowman) private s_attributes;
 
   DataTypes.Accessory[] private s_accessories;
-  mapping(address => bool) private s_accessoriesAvailable;
+  mapping(address accessory => bool isAvailable) private s_accessoriesAvailable;
 
-  // accessory address > snowman id > accessory id
-  mapping(address => mapping(uint256 => uint256)) private s_accessoriesById;
+  mapping(address accessory => mapping(uint256 snowmanId => uint256 accessoryId)) private s_accessoriesById;
 
   constructor(address feeCollector) ERC721("Snowman", "Snowman") {
     s_feeCollector = payable(feeCollector);

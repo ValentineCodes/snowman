@@ -1,6 +1,6 @@
 /// SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.18;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
@@ -29,7 +29,7 @@ contract Scarf is ERC721, Ownable {
   address s_feeCollector;
   Counters.Counter private s_tokenIds;
 
-  mapping(uint256 => DataTypes.Scarf) private s_attributes;
+  mapping(uint256 scarfId => DataTypes.Scarf scarf) private s_attributes;
 
   constructor(address feeCollector) ERC721("Scarf", "Scarf") {
     s_feeCollector = feeCollector;
