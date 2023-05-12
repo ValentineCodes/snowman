@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import { useDarkMode } from "usehooks-ts";
 import { WagmiConfig } from "wagmi";
 import { Header } from "~~/components/Header";
+import { Footer } from "~~/components/Footer";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { useNativeCurrencyPrice } from "~~/hooks/scaffold-eth";
 import { useGlobalState } from "~~/services/store/store";
@@ -51,12 +52,12 @@ const theme = extendBaseTheme({
       >
         <div className="flex flex-col min-h-screen">
           <Header />
-          <ChakraBaseProvider theme={theme}>
-          <main className="relative flex flex-col flex-1">
-            <Component {...pageProps} />
-          </main>
-
+            <ChakraBaseProvider theme={theme}>
+            <main className="relative flex flex-col flex-1">
+              <Component {...pageProps} />
+            </main>
           </ChakraBaseProvider>
+          <Footer />
         </div>
         <Toaster />
       </RainbowKitProvider>
