@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { AppProps } from "next/app";
 import { RainbowKitProvider, darkTheme, lightTheme } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
+import { ChakraBaseProvider, extendBaseTheme } from '@chakra-ui/react'
+import chakraTheme from '@chakra-ui/theme'
 import NextNProgress from "nextjs-progressbar";
 import { Toaster } from "react-hot-toast";
 import { useDarkMode } from "usehooks-ts";
@@ -20,6 +22,14 @@ const ScaffoldEthApp = ({ Component, pageProps }: AppProps) => {
   // This variable is required for initial client side rendering of correct theme for RainbowKit
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const { isDarkMode } = useDarkMode();
+
+  const { Spinner } = chakraTheme.components
+
+const theme = extendBaseTheme({
+  components: {
+    Spinner,
+  },
+})
 
   useEffect(() => {
     if (price > 0) {
@@ -41,9 +51,12 @@ const ScaffoldEthApp = ({ Component, pageProps }: AppProps) => {
       >
         <div className="flex flex-col min-h-screen">
           <Header />
+          <ChakraBaseProvider theme={theme}>
           <main className="relative flex flex-col flex-1">
             <Component {...pageProps} />
           </main>
+
+          </ChakraBaseProvider>
         </div>
         <Toaster />
       </RainbowKitProvider>
