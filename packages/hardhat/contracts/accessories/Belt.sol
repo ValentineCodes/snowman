@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.18;
 
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721Enumerable, ERC721} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {IERC721Receiver} from "@openzeppelin/contracts/interfaces/IERC721Receiver.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {Counters} from "@openzeppelin/contracts/utils/Counters.sol";
@@ -19,7 +19,7 @@ error Belt__ZeroAddress();
 error Belt__InvalidFeeCollector();
 error Belt__NotOwner();
 
-contract Belt is ERC721, Ownable {
+contract Belt is ERC721Enumerable, Ownable {
   using TypeCast for bytes;
   using Counters for Counters.Counter;
 

@@ -13,7 +13,7 @@ import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 
 type Props = {name: string, description: string, image: string}
 
-const Snowman = ({name, description, image}: Props) => {
+const Accessory = ({name, description, image}: Props) => {
   return (
     <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 p-2'>
         <SVG src={image} />
@@ -28,10 +28,7 @@ const Snowman = ({name, description, image}: Props) => {
               />
               <MenuList>
                 <MenuItem>
-                  Add Accessories
-                </MenuItem>
-                <MenuItem>
-                  Remove Accessories
+                  Add to Snowman☃️
                 </MenuItem>
                 <MenuItem>
                   Transfer
@@ -44,4 +41,4 @@ const Snowman = ({name, description, image}: Props) => {
   )
 }
 
-export default Snowman
+export default Accessory

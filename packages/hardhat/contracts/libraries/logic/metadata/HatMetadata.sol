@@ -12,7 +12,7 @@ library HatMetadata {
   using Strings for uint256;
 
   function tokenURI(DataTypes.Hat calldata hat, uint256 tokenId) external pure returns (string memory) {
-    string memory name = string(abi.encodePacked("Hat: #", tokenId.toString()));
+    string memory name = string(abi.encodePacked("Hat#", tokenId.toString()));
     string memory description = string(abi.encodePacked("This is a hat colored #", hat.color));
     string memory image = Base64.encode(bytes(generateSVG(hat)));
 

@@ -12,7 +12,7 @@ library BeltMetadata {
   using Strings for uint256;
 
   function tokenURI(DataTypes.Belt calldata belt, uint256 tokenId) external pure returns (string memory) {
-    string memory name = string(abi.encodePacked("Belt: #", tokenId.toString()));
+    string memory name = string(abi.encodePacked("Belt#", tokenId.toString()));
     string memory description = string(abi.encodePacked("This is a belt colored #", belt.color));
     string memory image = Base64.encode(bytes(generateSVG(belt)));
 

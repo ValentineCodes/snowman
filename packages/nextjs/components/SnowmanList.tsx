@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from 'react'
+import React, {useState, useEffect} from 'react'
 
 import Snowman from './cards/Snowman'
 import { useDeployedContractInfo } from '~~/hooks/scaffold-eth'

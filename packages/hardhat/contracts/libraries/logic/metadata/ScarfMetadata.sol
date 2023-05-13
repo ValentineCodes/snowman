@@ -12,7 +12,7 @@ library ScarfMetadata {
   using Strings for uint256;
 
   function tokenURI(DataTypes.Scarf calldata scarf, uint256 tokenId) external pure returns (string memory) {
-    string memory name = string(abi.encodePacked("Scarf: #", tokenId.toString()));
+    string memory name = string(abi.encodePacked("Scarf#", tokenId.toString()));
     string memory description = string(abi.encodePacked("This is a scarf colored #", scarf.color));
     string memory image = Base64.encode(bytes(generateSVG(scarf)));
 
