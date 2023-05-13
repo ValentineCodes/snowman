@@ -9,6 +9,7 @@ import {Spinner} from "@chakra-ui/react"
 type Props = {balance: number}
 
 const SnowmanList = ({balance}: Props) => {
+    const [userBalance, setUserBalance] = useState(balance)
     const [snowmen, setSnowmen] = useState<any[] | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
@@ -22,6 +23,7 @@ const SnowmanList = ({balance}: Props) => {
       
       (async () => {
         setIsLoading(true)
+        setUserBalance(balance)
         const snowman = new ethers.Contract(snowmanContract.address, snowmanContract.abi, provider)
         const tokenURIs = [];
         for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
@@ -40,17 +42,22 @@ const SnowmanList = ({balance}: Props) => {
       })()
     }, [balance, isLoadingSnowmanContract])
 
+    const removeSnowman = (id: number) => {
+      setSnowmen(snowmen => snowmen?.filter(snowman => snowman.id.toNumber() !== id.toNumber()))
+      setUserBalance(balance - 1)
+    }
+
     const renderSnowmanList = () => {
       if(!snowmen && isLoading) return <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />
 
       if(!snowmen || snowmen.length === 0) return
 
-      return snowmen.map(snowman => (<Snowman key={snowman.id} name={snowman.name} description={snowman.description} image={snowman.image} />))
+      return snowmen.map(snowman => (<Snowman key={snowman.id} id={snowman.id} name={snowman.name} description={snowman.description} image={snowman.image} removeSnowman={removeSnowman} />))
     }
 
   return (
     <section className='flex flex-col items-center'>
-      <p className="text-xl text-center">You own <strong>{balance || "No"}</strong> Snowman☃️</p>
+      <p className="text-xl text-center">You own <strong>{userBalance || "No"}</strong> Snowman☃️</p>
 
       <div className="flex flex-wrap justify-center items-center gap-5 my-10">
         {renderSnowmanList()}

@@ -18,7 +18,7 @@ import {
 
 import SVG from 'react-inlinesvg';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
-import { InputBase } from '../scaffold-eth';
+import { InputBase, AddressInput } from '../scaffold-eth';
 import { useAccount } from 'wagmi';
 import { useDeployedContractInfo, useScaffoldContractWrite } from '~~/hooks/scaffold-eth';
 import { ethers } from 'ethers';
@@ -27,8 +27,10 @@ type Props = {id: number, contractName: string, name: string, description: strin
 
 const Accessory = ({id, contractName, name, description, image, removeAccessory}: Props) => {
   const { isOpen: isAddToSnowmanModalOpen, onOpen: onOpenAddToSnowman, onClose: onCloseAddToSnowman } = useDisclosure()
+  const { isOpen: isTransferModalOpen, onOpen: onOpenTransferModal, onClose: onCloseTransferModal} = useDisclosure()
 
   const [snowmanId, setSnowmanId] = useState<number>()
+  const [recipient, setRecipient] = useState("")
 
   const {address: connectedAccount, isConnected} = useAccount()
   const {data: snowmanContract, isLoading: isLoadingSnowmanContract} = useDeployedContractInfo("Snowman")
@@ -42,6 +44,19 @@ const Accessory = ({id, contractName, name, description, image, removeAccessory}
     },
     onSuccess: () => {
       onCloseAddToSnowman()
+      removeAccessory(id)
+    }
+  })
+
+  const {writeAsync: transfer, isLoading: isTransferring, isSuccess: isTransferSuccessful} = useScaffoldContractWrite({
+    contractName: contractName,
+    functionName: "safeTransferFrom",
+    args: [connectedAccount, recipient, id],
+    overrides: {
+      gasLimit: ethers.BigNumber.from("500000"),
+    },
+    onSuccess: () => {
+      onCloseTransferModal()
       removeAccessory(id)
     }
   })
@@ -62,7 +77,7 @@ const Accessory = ({id, contractName, name, description, image, removeAccessory}
                 <MenuItem onClick={onOpenAddToSnowman}>
                   Add to Snowman☃️
                 </MenuItem>
-                <MenuItem>
+                <MenuItem onClick={onOpenTransferModal}>
                   Transfer
                 </MenuItem>
               </MenuList>
@@ -70,20 +85,36 @@ const Accessory = ({id, contractName, name, description, image, removeAccessory}
         </div>
 
         <Modal isOpen={isAddToSnowmanModalOpen} onClose={onCloseAddToSnowman}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalCloseButton className='text-white bg-orange-500 p-2 rounded-full' />
-          <ModalBody className='mt-10 space-y-2 flex flex-col items-center'>
-          <InputBase
-            name="snowmanId"
-            value={snowmanId || ""}
-            placeholder="Snowman id"
-            onChange={value => setSnowmanId(Number(value))}
-          />
-          <Button className='border-orange-500 bg-orange-500 hover:border-black hover:bg-white hover:text-black transition-all px-4 py-2 text-white rounded-md shadow-lg' onClick={addToSnowman} disabled={isComposing}>{isComposing? <Spinner size="md" thickness='4px' speed='0.65s' />: "Add"}</Button>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalCloseButton className='text-white bg-orange-500 p-2 rounded-full' />
+            <ModalBody className='mt-10 space-y-2 flex flex-col items-center'>
+            <InputBase
+              name="snowmanId"
+              value={snowmanId || ""}
+              placeholder="Snowman id"
+              onChange={value => setSnowmanId(Number(value))}
+            />
+            <Button className='border-orange-500 bg-orange-500 hover:border-black hover:bg-white hover:text-black transition-all px-4 py-2 text-white rounded-md shadow-lg' onClick={addToSnowman} disabled={isComposing}>{isComposing? <Spinner size="md" thickness='4px' speed='0.65s' />: "Add"}</Button>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
+
+        <Modal isOpen={isTransferModalOpen} onClose={onCloseTransferModal}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalCloseButton className='text-white bg-orange-500 p-2 rounded-full' />
+            <ModalBody className='mt-10 space-y-2 flex flex-col items-center'>
+            <AddressInput
+              name="recipient"
+              value={recipient}
+              placeholder="Recipient address"
+              onChange={setRecipient}
+            />
+            <Button className='border-orange-500 bg-orange-500 hover:border-black hover:bg-white hover:text-black transition-all px-4 py-2 text-white rounded-md shadow-lg' onClick={transfer} disabled={isTransferring}>{isTransferring? <Spinner size="md" thickness='4px' speed='0.65s' />: "Transfer"}</Button>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
     </div>
   )
 }

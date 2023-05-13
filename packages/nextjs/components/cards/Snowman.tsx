@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import {
   Menu,
@@ -6,14 +6,44 @@ import {
   MenuList,
   MenuItem,
   IconButton,
+  useDisclosure,
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
+  Spinner,
 } from '@chakra-ui/react'
 
 import SVG from 'react-inlinesvg';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
+import { ethers } from 'ethers';
+import { useAccount } from 'wagmi';
+import { useScaffoldContractWrite } from '~~/hooks/scaffold-eth';
+import { AddressInput } from '../scaffold-eth';
 
-type Props = {name: string, description: string, image: string}
+type Props = {id: number, name: string, description: string, image: string, removeSnowman: (id: number) => void}
 
-const Snowman = ({name, description, image}: Props) => {
+const Snowman = ({id, name, description, image, removeSnowman}: Props) => {
+  const { isOpen: isTransferModalOpen, onOpen: onOpenTransferModal, onClose: onCloseTransferModal} = useDisclosure()
+
+  const [recipient, setRecipient] = useState("")
+
+  const {address: connectedAccount, isConnected} = useAccount()
+
+  const {writeAsync: transfer, isLoading: isTransferring, isSuccess: isTransferSuccessful} = useScaffoldContractWrite({
+    contractName: "Snowman",
+    functionName: "safeTransferFrom",
+    args: [connectedAccount, recipient, id],
+    overrides: {
+      gasLimit: ethers.BigNumber.from("500000"),
+    },
+    onSuccess: () => {
+      onCloseTransferModal()
+      removeSnowman(id)
+    }
+  })
   return (
     <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 p-2'>
         <SVG src={image} />
@@ -28,17 +58,30 @@ const Snowman = ({name, description, image}: Props) => {
               />
               <MenuList>
                 <MenuItem>
-                  Add Accessories
-                </MenuItem>
-                <MenuItem>
                   Remove Accessories
                 </MenuItem>
-                <MenuItem>
+                <MenuItem onClick={onOpenTransferModal}>
                   Transfer
                 </MenuItem>
               </MenuList>
             </Menu>
         </div>
+
+        <Modal isOpen={isTransferModalOpen} onClose={onCloseTransferModal}>
+          <ModalOverlay />
+          <ModalContent>
+            <ModalCloseButton className='text-white bg-orange-500 p-2 rounded-full' />
+            <ModalBody className='mt-10 space-y-2 flex flex-col items-center'>
+            <AddressInput
+              name="recipient"
+              value={recipient}
+              placeholder="Recipient address"
+              onChange={setRecipient}
+            />
+            <Button className='border-orange-500 bg-orange-500 hover:border-black hover:bg-white hover:text-black transition-all px-4 py-2 text-white rounded-md shadow-lg' onClick={transfer} disabled={isTransferring}>{isTransferring? <Spinner size="md" thickness='4px' speed='0.65s' />: "Transfer"}</Button>
+            </ModalBody>
+          </ModalContent>
+        </Modal>
     </div>
   )
 }
