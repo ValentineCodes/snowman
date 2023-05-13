@@ -6,16 +6,16 @@ import { useAccount, useProvider } from 'wagmi'
 import {ethers} from "ethers"
 import {Spinner} from "@chakra-ui/react"
 
-type Props = {balance: number}
+type Props = {name: string, icon: string | JSX.Element, balance: number}
 
-const AccessoryList = ({balance}: Props) => {
+const AccessoryList = ({name, icon, balance}: Props) => {
     const [accessories, setAccessories] = useState<any[] | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
   const {address: connectedAccount, isConnected} = useAccount()
   const provider = useProvider()
 
-    const {data: accessoryContract, isLoading: isLoadingAccessoryContract} = useDeployedContractInfo("Hat")
+    const {data: accessoryContract, isLoading: isLoadingAccessoryContract} = useDeployedContractInfo(name)
 
     useEffect(() => { 
       if(isLoadingAccessoryContract || !isConnected) return
@@ -38,10 +38,10 @@ const AccessoryList = ({balance}: Props) => {
         setAccessories(tokenURIs)
         setIsLoading(false)
       })()
-    }, [balance, isLoadingAccessoryContract])
+    }, [balance, isLoadingAccessoryContract, name])
 
     const renderAccessoryList = () => {
-      if(!accessories && isLoading) return <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />
+      if(isLoading) return <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />
 
       if(!accessories || accessories.length === 0) return
 
@@ -50,7 +50,7 @@ const AccessoryList = ({balance}: Props) => {
 
   return (
     <section className='flex flex-col items-center'>
-      <p className="text-xl text-center">You own <strong>{balance || "No"}</strong> Hat🎩</p>
+      <p className="text-xl text-center">You own <strong>{balance || "No"}</strong> {name}{icon}</p>
 
       <div className="flex flex-wrap justify-center items-center gap-5 my-10">
         {renderAccessoryList()}

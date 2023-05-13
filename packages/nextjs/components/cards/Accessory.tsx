@@ -35,7 +35,6 @@ const Accessory = ({name, description, image}: Props) => {
                 </MenuItem>
               </MenuList>
             </Menu>
-            {/* <EllipsisHorizontalIcon className='w-10 font-bold bg-white rounded-md p-1 border border-gray-300 cursor-pointer transition duration-300 hover:border-orange-500 hover:text-white hover:bg-orange-500' /> */}
         </div>
     </div>
   )
