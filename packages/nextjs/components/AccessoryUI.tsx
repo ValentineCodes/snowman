@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldContractWrite } from '~~/hooks/scaffold-eth'
 import { Spinner } from '@chakra-ui/react'
 import AccessoryList from './AccessoryList'
-import { useAccount } from 'wagmi'
+import { useAccount, useProvider } from 'wagmi'
 import { ethers } from 'ethers'
 
 type Props = {name: string, icon: string | JSX.Element}
@@ -22,21 +22,32 @@ const AccessoryUI = ({name, icon, className}: Props) => {
     const {writeAsync: mint, isLoading: isMinting, isSuccess: isMinted} = useScaffoldContractWrite({
       contractName: name,
       functionName: "mint",
-      value: "0.01",
-      gasLimit: 500000,
+      overrides: {
+        value: ethers.utils.parseEther("0.01"),
+        gasLimit: ethers.BigNumber.from("500000"),
+      },
       onSuccess: () => {
           setBalance(balance + 1)
       }
     })
+
+
+  const provider = useProvider()
+  const {data: accessoryContract, isLoading: isLoadingAccessoryContract} = useDeployedContractInfo(name)
   
-    useEffect(() => {
-      if(!isConnected || isLoadingUserBalance) return 
-  
-      const balance = userBalance && userBalance.toNumber && userBalance.toNumber()
+  useEffect(() => {
+    (async () => {
+      if(!isConnected || isLoadingAccessoryContract) return 
+
+      setIsLoading(true)
+      
+      const accessory = new ethers.Contract(accessoryContract?.address, accessoryContract.abi, provider)
+      const balance = (await accessory.balanceOf(connectedAccount)).toNumber()
+
       setBalance(balance)
       setIsLoading(false)
-  
-    }, [isLoadingUserBalance, isConnected, connectedAccount, name])
+    })()
+  }, [isLoadingAccessoryContract, isConnected, connectedAccount, name])
 
   return (
     <main className={`flex flex-col items-center gap-4 px-4 py-8 ${className}`}>

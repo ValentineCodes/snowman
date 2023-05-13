@@ -9,6 +9,7 @@ import {Spinner} from "@chakra-ui/react"
 type Props = {name: string, icon: string | JSX.Element, balance: number}
 
 const AccessoryList = ({name, icon, balance}: Props) => {
+    const [userBalance, setUserBalance] = useState(balance)
     const [accessories, setAccessories] = useState<any[] | null>(null)
     const [isLoading, setIsLoading] = useState(true)
 
@@ -22,6 +23,7 @@ const AccessoryList = ({name, icon, balance}: Props) => {
       
       (async () => {
         setIsLoading(true)
+        setUserBalance(balance)
         const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, provider)
         const tokenURIs = [];
         for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
@@ -40,17 +42,22 @@ const AccessoryList = ({name, icon, balance}: Props) => {
       })()
     }, [balance, isLoadingAccessoryContract, name])
 
+    const removeAccesory = (id: number) => {
+      setAccessories(accessories => accessories?.filter(accessory => accessory.id.toNumber() !== id.toNumber()))
+      setUserBalance(balance - 1)
+    }
+
     const renderAccessoryList = () => {
       if(isLoading) return <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />
 
       if(!accessories || accessories.length === 0) return
 
-      return accessories.map(accessory => (<Accessory key={accessory.id} name={accessory.name} description={accessory.description} image={accessory.image} />))
+      return accessories.map(accessory => (<Accessory key={accessory.id} id={accessory.id} contractName={name} name={accessory.name} description={accessory.description} image={accessory.image} removeAccessory={removeAccesory} />))
     }
 
   return (
     <section className='flex flex-col items-center'>
-      <p className="text-xl text-center">You own <strong>{balance || "No"}</strong> {name}{icon}</p>
+      <p className="text-xl text-center">You own <strong>{userBalance || "No"}</strong> {name}{icon}</p>
 
       <div className="flex flex-wrap justify-center items-center gap-5 my-10">
         {renderAccessoryList()}

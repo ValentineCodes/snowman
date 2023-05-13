@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useState} from 'react'
 
 import {
   Menu,
@@ -6,14 +6,46 @@ import {
   MenuList,
   MenuItem,
   IconButton,
+  useDisclosure,
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
+  Spinner
 } from '@chakra-ui/react'
 
 import SVG from 'react-inlinesvg';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
+import { InputBase } from '../scaffold-eth';
+import { useAccount } from 'wagmi';
+import { useDeployedContractInfo, useScaffoldContractWrite } from '~~/hooks/scaffold-eth';
+import { ethers } from 'ethers';
 
-type Props = {name: string, description: string, image: string}
+type Props = {id: number, contractName: string, name: string, description: string, image: string, removeAccessory: (id: number) => void}
 
-const Accessory = ({name, description, image}: Props) => {
+const Accessory = ({id, contractName, name, description, image, removeAccessory}: Props) => {
+  const { isOpen: isAddToSnowmanModalOpen, onOpen: onOpenAddToSnowman, onClose: onCloseAddToSnowman } = useDisclosure()
+
+  const [snowmanId, setSnowmanId] = useState<number>()
+
+  const {address: connectedAccount, isConnected} = useAccount()
+  const {data: snowmanContract, isLoading: isLoadingSnowmanContract} = useDeployedContractInfo("Snowman")
+
+  const {writeAsync: addToSnowman, isLoading: isComposing, isSuccess: isCompositionSuccessful} = useScaffoldContractWrite({
+    contractName: contractName,
+    functionName: "safeTransferFrom",
+    args: [connectedAccount, snowmanContract?.address, id, ethers.utils.defaultAbiCoder.encode(["uint256"], [(snowmanId || 0)])],
+    overrides: {
+      gasLimit: ethers.BigNumber.from("500000"),
+    },
+    onSuccess: () => {
+      onCloseAddToSnowman()
+      removeAccessory(id)
+    }
+  })
+
   return (
     <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 p-2'>
         <SVG src={image} />
@@ -27,7 +59,7 @@ const Accessory = ({name, description, image}: Props) => {
                 variant='outline'
               />
               <MenuList>
-                <MenuItem>
+                <MenuItem onClick={onOpenAddToSnowman}>
                   Add to Snowman☃️
                 </MenuItem>
                 <MenuItem>
@@ -36,6 +68,22 @@ const Accessory = ({name, description, image}: Props) => {
               </MenuList>
             </Menu>
         </div>
+
+        <Modal isOpen={isAddToSnowmanModalOpen} onClose={onCloseAddToSnowman}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalCloseButton className='text-white bg-orange-500 p-2 rounded-full' />
+          <ModalBody className='mt-10 space-y-2 flex flex-col items-center'>
+          <InputBase
+            name="snowmanId"
+            value={snowmanId || ""}
+            placeholder="Snowman id"
+            onChange={value => setSnowmanId(Number(value))}
+          />
+          <Button className='border-orange-500 bg-orange-500 hover:border-black hover:bg-white hover:text-black transition-all px-4 py-2 text-white rounded-md shadow-lg' onClick={addToSnowman} disabled={isComposing}>{isComposing? <Spinner size="md" thickness='4px' speed='0.65s' />: "Add"}</Button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   )
 }

@@ -24,11 +24,12 @@ const ScaffoldEthApp = ({ Component, pageProps }: AppProps) => {
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const { isDarkMode } = useDarkMode();
 
-  const { Menu, Spinner } = chakraTheme.components
+  const { Menu, Modal, Spinner } = chakraTheme.components
 
 const theme = extendBaseTheme({
   components: {
     Menu,
+    Modal,
     Spinner,
   },
 })

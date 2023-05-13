@@ -5,9 +5,10 @@ import Link from "next/link";
 
 import { Spinner } from '@chakra-ui/react'
 import { useTypewriter } from 'react-simple-typewriter'
-import { useAccount } from "wagmi";
+import { useAccount, useProvider } from "wagmi";
+import { ethers } from "ethers";
 
-import { useScaffoldContractWrite, useScaffoldContractRead } from "~~/hooks/scaffold-eth";
+import { useScaffoldContractWrite, useScaffoldContractRead, useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 import SnowmanList from "~~/components/SnowmanList";
 
 
@@ -32,22 +33,31 @@ const Home: NextPage = () => {
   const {writeAsync: mint, isLoading: isMinting, isSuccess: isMinted} = useScaffoldContractWrite({
     contractName: "Snowman",
     functionName: "mint",
-    value: "0.02",
-    gasLimit: 500000,
+    overrides: {
+      value: ethers.utils.parseEther("0.02"),
+      gasLimit: ethers.BigNumber.from("500000"),
+    },
     onSuccess: () => {
         setBalance(balance + 1)
     }
   })
 
+  const provider = useProvider()
+  const {data: snowmanContract, isLoading: isLoadingSnowmanContract} = useDeployedContractInfo("Snowman")
+
   useEffect(() => {
-    if(!isConnected || isLoadingUserBalance) return 
+    (async () => {
+      if(!isConnected || isLoadingSnowmanContract) return 
 
-    const balance = userBalance && userBalance.toNumber && userBalance.toNumber()
-    console.log("Balance: ", balance)
-    setBalance(balance)
-    setIsLoading(false)
+      setIsLoading(true)
 
-  }, [isConnected, connectedAccount])
+      const snowman = new ethers.Contract(snowmanContract?.address, snowmanContract.abi, provider)
+      const balance = (await snowman.balanceOf(connectedAccount)).toNumber()
+
+      setBalance(balance)
+      setIsLoading(false)
+    })()
+  }, [isLoadingSnowmanContract, isConnected, connectedAccount])
 
   return (
     <>
