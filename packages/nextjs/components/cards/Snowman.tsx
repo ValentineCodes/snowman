@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 import {
   Menu,
@@ -19,18 +19,78 @@ import {
 import SVG from 'react-inlinesvg';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 import { ethers } from 'ethers';
-import { useAccount } from 'wagmi';
-import { useScaffoldContractWrite } from '~~/hooks/scaffold-eth';
+import { useAccount, useProvider, erc721ABI, useSigner } from 'wagmi';
+import { useScaffoldContractWrite, useDeployedContractInfo } from '~~/hooks/scaffold-eth';
 import { AddressInput } from '../scaffold-eth';
 
-type Props = {id: number, name: string, description: string, image: string, removeSnowman: (id: number) => void}
+type Props = {id: number, remove: () => void}
+interface Metadata {
+  name: string,
+  image: string
+}
 
-const Snowman = ({id, name, description, image, removeSnowman}: Props) => {
-  const { isOpen: isTransferModalOpen, onOpen: onOpenTransferModal, onClose: onCloseTransferModal} = useDisclosure()
+interface Accessory {
+  name: string,
+  address: string,
+  isWorn: boolean
+}
 
+const Snowman = ({id, remove}: Props) => {
+  const [metadata, setMetadata] = useState<Metadata>()
+  const [accessories, setAccessories] = useState<Accessory>()
   const [recipient, setRecipient] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+  const [isRemovingAccessory, setIsRemovingAccessory] = useState<string>()
 
+  const ISnowman = useRef(null)
+
+  const { isOpen: isTransferModalOpen, onOpen: onOpenTransferModal, onClose: onCloseTransferModal} = useDisclosure()
   const {address: connectedAccount, isConnected} = useAccount()
+  const provider = useProvider()
+  const {data: signer} = useSigner()
+
+  const {data: snowmanContract, isLoading: isLoadingSnowmanContract} = useDeployedContractInfo("Snowman")
+
+  const getDetails = async () => {
+    if(isLoadingSnowmanContract || !isConnected) return
+
+    try {
+      setIsLoading(true)
+      ISnowman.current = new ethers.Contract(snowmanContract.address, snowmanContract.abi, provider)
+
+      const tokenURI = await ISnowman.current.tokenURI(id);
+      const metadata = await (await fetch(tokenURI)).json()
+      metadata.image = await (await fetch(metadata.image)).text()
+
+      const accessories: any[] = await ISnowman.current.getAccessories()
+      const _accessories = []
+
+      for (let i = 0; i < accessories.length; i++) {
+        const address = accessories[i][0]
+        try {
+          const isWorn = await ISnowman.current.hasAccessory(address, id)
+          const accessory = new ethers.Contract(address, erc721ABI, provider)
+          const name = await accessory.name()
+          _accessories.push({name, address, isWorn})
+        } catch(error) {
+          console.error(error)
+        }
+      }
+
+      setMetadata(metadata)
+      setAccessories(_accessories)
+
+    } catch(error) {
+      console.log("Error getting details for Snowman ", id)
+      console.error(error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    getDetails()
+  }, [isLoadingSnowmanContract])
 
   const {writeAsync: transfer, isLoading: isTransferring, isSuccess: isTransferSuccessful} = useScaffoldContractWrite({
     contractName: "Snowman",
@@ -41,14 +101,46 @@ const Snowman = ({id, name, description, image, removeSnowman}: Props) => {
     },
     onSuccess: () => {
       onCloseTransferModal()
-      removeSnowman(id)
+      remove()
     }
   })
+
+  const {writeAsync: removeAllAccessories, isLoading: isRemovingAllAccessories, isSuccess: isRemoveAllSuccessful} = useScaffoldContractWrite({
+    contractName: "Snowman",
+    functionName: "removeAllAccessories",
+    args: [id],
+    overrides: {
+      gasLimit: 500000
+    },
+    onSuccess: () => {
+      getDetails()
+    }
+  })
+
+  const removeAccessory = async (accessory: Accessory) => {
+    try {
+      setIsRemovingAccessory(accessory.name)
+      const snowman = ISnowman.current.connect(signer)
+      await snowman.removeAccessory(accessory.address, id, {
+        gasLimit: 500000
+      })
+      getDetails()
+    } catch(error){
+      console.log("Error removing ", accessory.address)
+      console.error(error)
+    } finally {
+      setIsRemovingAccessory(accessory.name)
+    }
+  }
+
+  if(isLoading) return <Spinner size="md" thickness='4px' speed='0.65s' />
+  if(!metadata) return
+
   return (
     <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 p-2'>
-        <SVG src={image} />
+        <SVG src={metadata.image} />
         <div className='flex items-center justify-between gap-5 p-2 text-black'>
-            <h1 className='font-bold text-lg'>{name}</h1>
+            <h1 className='font-bold text-lg'>{metadata.name}</h1>
             <Menu>
               <MenuButton
                 as={IconButton}
@@ -57,9 +149,22 @@ const Snowman = ({id, name, description, image, removeSnowman}: Props) => {
                 variant='outline'
               />
               <MenuList>
-                <MenuItem>
-                  Remove Accessories
-                </MenuItem>
+                {accessories?.filter(accessory => accessory.isWorn)?.length > 0 && (
+                  <>
+                    <Menu>
+                      <MenuButton as={Button}>
+                      <MenuItem> Remove Accessory</MenuItem>
+                      </MenuButton>
+                      <MenuList>
+                        {accessories.filter(accessory => accessory.isWorn).map(accessory => <MenuItem onClick={() => removeAccessory(accessory)}>{accessory.name}</MenuItem>)}
+                      </MenuList>
+                    </Menu>
+                    
+                    <MenuItem onClick={removeAllAccessories}>
+                      Remove All Accessories
+                    </MenuItem>
+                  </>
+                )}
                 <MenuItem onClick={onOpenTransferModal}>
                   Transfer
                 </MenuItem>

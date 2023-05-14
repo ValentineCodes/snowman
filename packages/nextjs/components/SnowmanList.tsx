@@ -25,34 +25,34 @@ const SnowmanList = ({balance}: Props) => {
         setIsLoading(true)
         setUserBalance(balance)
         const snowman = new ethers.Contract(snowmanContract.address, snowmanContract.abi, provider)
-        const tokenURIs = [];
+        const tokenIds = [];
         for (let tokenIndex = 0; tokenIndex < balance; tokenIndex++) {
           try {
             const tokenId = await snowman.tokenOfOwnerByIndex(connectedAccount, tokenIndex);
-            const tokenURI = await snowman.tokenURI(tokenId);
-            const metadata = await (await fetch(tokenURI)).json()
-            metadata.image = await (await fetch(metadata.image)).text()
-            tokenURIs.push({ id: tokenId, ...metadata});
+            tokenIds.push({ id: tokenId});
           } catch(error) {
             console.error(error)
           }
         }
-        setSnowmen(tokenURIs)
+        setSnowmen(tokenIds)
         setIsLoading(false)
       })()
     }, [balance, isLoadingSnowmanContract])
 
-    const removeSnowman = (id: number) => {
-      setSnowmen(snowmen => snowmen?.filter(snowman => snowman.id.toNumber() !== id.toNumber()))
-      setUserBalance(balance - 1)
-    }
+
 
     const renderSnowmanList = () => {
       if(!snowmen && isLoading) return <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />
 
       if(!snowmen || snowmen.length === 0) return
 
-      return snowmen.map(snowman => (<Snowman key={snowman.id} id={snowman.id} name={snowman.name} description={snowman.description} image={snowman.image} removeSnowman={removeSnowman} />))
+      return snowmen.map(snowman => {
+        const remove = () => {
+          setSnowmen(snowmen => snowmen?.filter(_snowman => _snowman.id.toNumber() !== snowman.id.toNumber()))
+          setUserBalance(balance - 1)
+        }
+        return <Snowman key={snowman.id} id={snowman.id} remove={remove} />
+      })
     }
 
   return (
