@@ -13,6 +13,7 @@
     "chain": "yarn workspace @snowman/hardhat chain",
     "fork": "yarn workspace @snowman/hardhat fork",
     "deploy": "yarn workspace @snowman/hardhat deploy",
+    "deploy:sepolia": "yarn workspace @snowman/hardhat deploy:sepolia",
     "verify": "yarn workspace @snowman/hardhat verify",
     "verify:sepolia": "yarn workspace @snowman/hardhat verify:sepolia",
     "compile": "yarn workspace @snowman/hardhat compile",
