@@ -3150,7 +3150,7 @@ const contracts = {
       chainId: "11155111",
       contracts: {
         TokenURIGen: {
-          address: "0x0302bC444820F027c1d7411847856e3f74E6dF70",
+          address: "0x186B2a618faf5B7528896bEB58C5b1dC17266c59",
           abi: [
             {
               inputs: [
@@ -3257,11 +3257,11 @@ const contracts = {
           ],
         },
         SnowmanMetadata: {
-          address: "0xc49C78CBC1b64a5D47BC23c92a5CfE119763764c",
+          address: "0x1B171b7320F95348A8ec08C6C250D15E4e02DCce",
           abi: [],
         },
         AccessoryManager: {
-          address: "0x74c07564c6e7d1d6D0c4bD80609981e754814847",
+          address: "0x6746CC26Dc5d0bf1A64f7d25Db859bad575d35F2",
           abi: [
             {
               inputs: [],
@@ -3357,7 +3357,7 @@ const contracts = {
           ],
         },
         AttributesGen: {
-          address: "0xB06bA36916D091C53568D4F9151c6D4120442140",
+          address: "0x22dE1442f97AdEF4dcc6fC9437B671b302Cbc193",
           abi: [
             {
               inputs: [
@@ -3378,7 +3378,7 @@ const contracts = {
           ],
         },
         Snowman: {
-          address: "0x9d884246043122c4EE25738bD1c3ce89692182EB",
+          address: "0x50eF2705Ec4B7ad8baC3a2f941Aee2CDc9a2B786",
           abi: [
             {
               inputs: [
@@ -4307,7 +4307,7 @@ const contracts = {
           ],
         },
         HatMetadata: {
-          address: "0xFC278172334f8Ca0CD9a2118CB92296284A9E83B",
+          address: "0x7b96053c5f92905b6235D48151deD6e5eeBF57a6",
           abi: [
             {
               inputs: [
@@ -4369,7 +4369,7 @@ const contracts = {
           ],
         },
         Hat: {
-          address: "0xeF20ad6245cf8E854de8952BbB04bf8594914AAf",
+          address: "0x5D8602Fb30D2cd97235F847E9a214E1315ad8391",
           abi: [
             {
               inputs: [
@@ -4967,7 +4967,7 @@ const contracts = {
           ],
         },
         ScarfMetadata: {
-          address: "0xE249C88d3E476a4364030443334335abeeBB9670",
+          address: "0xd031979460D82EFFA8D03955F46D546639657f8E",
           abi: [
             {
               inputs: [
@@ -5029,7 +5029,7 @@ const contracts = {
           ],
         },
         Scarf: {
-          address: "0x37DCd499A633397061AC39F22a5E2E6928272630",
+          address: "0x33916Ca06f94FacA916916c8651499E9283e717F",
           abi: [
             {
               inputs: [
@@ -5627,7 +5627,7 @@ const contracts = {
           ],
         },
         BeltMetadata: {
-          address: "0xdEE8008fc5BfC9c8b6F0Abf12aa592f970801C95",
+          address: "0xAf1a7a3cC826Cb7799600352AE8eC7888202BC6c",
           abi: [
             {
               inputs: [
@@ -5689,7 +5689,7 @@ const contracts = {
           ],
         },
         Belt: {
-          address: "0x74cD432f0Ff8786C4cEA5817e5B402a744A2AF53",
+          address: "0x6D9330645889eB3EF2a87e7009c997DEF3b27Eae",
           abi: [
             {
               inputs: [
