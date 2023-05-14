@@ -19,47 +19,71 @@ import {
 import SVG from 'react-inlinesvg';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 import { InputBase, AddressInput } from '../scaffold-eth';
-import { useAccount } from 'wagmi';
+import { useAccount, useSigner } from 'wagmi';
 import { useDeployedContractInfo, useScaffoldContractWrite } from '~~/hooks/scaffold-eth';
 import { ethers } from 'ethers';
+import { notification } from '~~/utils/scaffold-eth';
 
-type Props = {id: number, contractName: string, name: string, description: string, image: string, removeAccessory: (id: number) => void}
+type Props = {id: number, contractName: string, name: string, description: string, image: string, remove: () => void}
 
-const Accessory = ({id, contractName, name, description, image, removeAccessory}: Props) => {
+const Accessory = ({id, contractName, name, description, image, remove}: Props) => {
   const { isOpen: isAddToSnowmanModalOpen, onOpen: onOpenAddToSnowman, onClose: onCloseAddToSnowman } = useDisclosure()
   const { isOpen: isTransferModalOpen, onOpen: onOpenTransferModal, onClose: onCloseTransferModal} = useDisclosure()
 
   const [snowmanId, setSnowmanId] = useState<number>()
   const [recipient, setRecipient] = useState("")
+  const [isTransferring, setIsTransferring] = useState(false)
+  const [isComposing, setIsComposing] = useState(false)
+
+  const {data: signer, isLoading: isLoadingSigner} = useSigner()
 
   const {address: connectedAccount, isConnected} = useAccount()
   const {data: snowmanContract, isLoading: isLoadingSnowmanContract} = useDeployedContractInfo("Snowman")
+  const {data: accessoryContract, isLoading: isLoadingAccessoryContract} = useDeployedContractInfo(contractName)
 
-  const {writeAsync: addToSnowman, isLoading: isComposing, isSuccess: isCompositionSuccessful} = useScaffoldContractWrite({
-    contractName: contractName,
-    functionName: "safeTransferFrom",
-    args: [connectedAccount, snowmanContract?.address, id, ethers.utils.defaultAbiCoder.encode(["uint256"], [(snowmanId || 0)])],
-    overrides: {
-      gasLimit: ethers.BigNumber.from("500000"),
-    },
-    onSuccess: () => {
+  const addToSnowman = async () => {
+    if(isComposing || !isConnected || isLoadingAccessoryContract || isLoadingSnowmanContract || isLoadingSigner) return
+
+    try {
+      setIsComposing(true)
+      const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
+
+      const tx = await accessory["safeTransferFrom(address,address,uint256,bytes)"](connectedAccount, snowmanContract?.address, id, ethers.utils.defaultAbiCoder.encode(["uint256"], [(snowmanId || 0)]), {
+        gasLimit: 500000
+      })
+      await tx.wait(1)
+
       onCloseAddToSnowman()
-      removeAccessory(id)
+      remove()
+    } catch(error) {
+      console.log(error)
+      notification.error(JSON.stringify(error))
     }
-  })
 
-  const {writeAsync: transfer, isLoading: isTransferring, isSuccess: isTransferSuccessful} = useScaffoldContractWrite({
-    contractName: contractName,
-    functionName: "safeTransferFrom",
-    args: [connectedAccount, recipient, id],
-    overrides: {
-      gasLimit: ethers.BigNumber.from("500000"),
-    },
-    onSuccess: () => {
+    setIsComposing(false)
+  }
+
+  const transfer = async () => {
+    if(isTransferring || !isConnected || isLoadingAccessoryContract || isLoadingSigner) return
+
+    try {
+      setIsTransferring(true)
+      const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
+
+      const tx = await accessory["safeTransferFrom(address,address,uint256)"](connectedAccount, recipient, id, {
+        gasLimit: 500000
+      })
+      await tx.wait(1)
+
       onCloseTransferModal()
-      removeAccessory(id)
+      remove()
+    } catch(error) {
+      console.log(error)
+      notification.error(JSON.stringify(error))
     }
-  })
+
+    setIsTransferring(false)
+  }
 
   return (
     <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 p-2'>

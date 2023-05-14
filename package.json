@@ -14,6 +14,7 @@
     "fork": "yarn workspace @snowman/hardhat fork",
     "deploy": "yarn workspace @snowman/hardhat deploy",
     "verify": "yarn workspace @snowman/hardhat verify",
+    "verify:sepolia": "yarn workspace @snowman/hardhat verify:sepolia",
     "compile": "yarn workspace @snowman/hardhat compile",
     "generate": "yarn workspace @snowman/hardhat generate",
     "hardhat:lint": "yarn workspace @snowman/hardhat lint",

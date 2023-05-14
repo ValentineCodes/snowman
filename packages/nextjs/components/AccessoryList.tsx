@@ -42,17 +42,18 @@ const AccessoryList = ({name, icon, balance}: Props) => {
       })()
     }, [balance, isLoadingAccessoryContract, name])
 
-    const removeAccesory = (id: number) => {
-      setAccessories(accessories => accessories?.filter(accessory => accessory.id.toNumber() !== id.toNumber()))
-      setUserBalance(balance - 1)
-    }
-
     const renderAccessoryList = () => {
       if(isLoading) return <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />
 
       if(!accessories || accessories.length === 0) return
 
-      return accessories.map(accessory => (<Accessory key={accessory.id} id={accessory.id} contractName={name} name={accessory.name} description={accessory.description} image={accessory.image} removeAccessory={removeAccesory} />))
+      return accessories.map(accessory => {
+        const remove = () => {
+          setAccessories(accessories => accessories?.filter(_accessory => _accessory.id.toNumber() !== accessory.id.toNumber()))
+          setUserBalance(balance - 1)
+        }
+        return <Accessory key={accessory.id} id={accessory.id} contractName={name} name={accessory.name} description={accessory.description} image={accessory.image} remove={remove} />
+      })
     }
 
   return (

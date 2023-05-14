@@ -22,6 +22,7 @@ import { ethers } from 'ethers';
 import { useAccount, useProvider, erc721ABI, useSigner } from 'wagmi';
 import { useScaffoldContractWrite, useDeployedContractInfo } from '~~/hooks/scaffold-eth';
 import { AddressInput } from '../scaffold-eth';
+import { notification } from '~~/utils/scaffold-eth';
 
 type Props = {id: number, remove: () => void}
 interface Metadata {
@@ -41,6 +42,8 @@ const Snowman = ({id, remove}: Props) => {
   const [recipient, setRecipient] = useState("")
   const [isLoading, setIsLoading] = useState(true)
   const [isRemovingAccessory, setIsRemovingAccessory] = useState<string>()
+  const [isRemovingAllAccessories, setIsRemovingAllAccessories] = useState(false)
+  const [isTransferring, setIsTransferring] = useState(false)
 
   const ISnowman = useRef(null)
 
@@ -92,46 +95,77 @@ const Snowman = ({id, remove}: Props) => {
     getDetails()
   }, [isLoadingSnowmanContract])
 
-  const {writeAsync: transfer, isLoading: isTransferring, isSuccess: isTransferSuccessful} = useScaffoldContractWrite({
-    contractName: "Snowman",
-    functionName: "safeTransferFrom",
-    args: [connectedAccount, recipient, id],
-    overrides: {
-      gasLimit: ethers.BigNumber.from("500000"),
-    },
-    onSuccess: () => {
-      onCloseTransferModal()
-      remove()
-    }
-  })
-
-  const {writeAsync: removeAllAccessories, isLoading: isRemovingAllAccessories, isSuccess: isRemoveAllSuccessful} = useScaffoldContractWrite({
-    contractName: "Snowman",
-    functionName: "removeAllAccessories",
-    args: [id],
-    overrides: {
-      gasLimit: 500000
-    },
-    onSuccess: () => {
-      getDetails()
-    }
-  })
+  // const {writeAsync: transfer, isLoading: isTransferring, isSuccess: isTransferSuccessful} = useScaffoldContractWrite({
+  //   contractName: "Snowman",
+  //   functionName: "safeTransferFrom",
+  //   args: [connectedAccount, recipient, id],
+  //   overrides: {
+  //     gasLimit: ethers.BigNumber.from("500000"),
+  //   },
+  //   onSuccess: () => {
+  //     onCloseTransferModal()
+  //     remove()
+  //   }
+  // })
 
   const removeAccessory = async (accessory: Accessory) => {
     if(isRemovingAccessory) return
     try {
       setIsRemovingAccessory(accessory.name)
       const snowman = ISnowman.current.connect(signer)
-      await snowman.removeAccessory(accessory.address, id, {
+
+      const tx = await snowman.removeAccessory(accessory.address, id, {
         gasLimit: 500000
       })
+      await tx.wait(1)
+
+      setIsRemovingAccessory("")
       getDetails()
     } catch(error){
-      console.log("Error removing ", accessory.name)
-      console.error(error)
-    } finally {
+      notification.error(JSON.stringify(error))
       setIsRemovingAccessory("")
     }
+  }
+
+  const removeAllAccessories = async () => {
+    if(isRemovingAllAccessories) return
+    try {
+      setIsRemovingAllAccessories(true)
+      const snowman = ISnowman.current.connect(signer)
+
+      const tx = await snowman.removeAllAccessories(id, {
+        gasLimit: 500000
+      })
+      await tx.wait(1)
+
+      setIsRemovingAllAccessories(false)
+      getDetails()
+    } catch(error) {
+      notification.error(JSON.stringify(error))
+      setIsRemovingAllAccessories(false)
+    }
+  }
+
+  const transfer = async () => {
+    if(isTransferring || !isConnected) return
+
+    setIsTransferring(true)
+
+    try {
+      const snowman = ISnowman.current.connect(signer)
+
+      const tx = await snowman["safeTransferFrom(address,address,uint256)"](connectedAccount, recipient, id, {
+        gasLimit: 500000
+      })
+      await tx.wait(1)
+
+      onCloseTransferModal()
+      remove()
+    } catch(error) {
+      notification.error(JSON.stringify(error))
+    }
+
+    setIsTransferring(false)
   }
 
   if(isLoading) return <Spinner size="md" thickness='4px' speed='0.65s' />
@@ -157,7 +191,7 @@ const Snowman = ({id, remove}: Props) => {
                       <MenuItem> Remove Accessory</MenuItem>
                       </MenuButton>
                       <MenuList>
-                        {accessories.filter(accessory => accessory.isWorn).map(accessory => <MenuItem onClick={() => removeAccessory(accessory)}>{accessory.name}{isRemovingAccessory === accessory.name && <Spinner size="sm" thickness='4px' speed='0.65s' className="ml-2" />}</MenuItem>)}
+                        {accessories?.filter(accessory => accessory.isWorn).map(accessory => <MenuItem onClick={() => removeAccessory(accessory)}>{accessory.name}{isRemovingAccessory === accessory.name && <Spinner size="sm" thickness='4px' speed='0.65s' className="ml-2" />}</MenuItem>)}
                       </MenuList>
                     </Menu>
                     
