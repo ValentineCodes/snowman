@@ -4,7 +4,7 @@
 <img src="snowman.svg" alt="Snowman" width="300">
 </p>
 
-[Snowman](https://snowman-mu.vercel.app/) is a composable NFT based on the ERC4883 standard which enables you to mint a snowman with dynamic attributes(sky color, wind direction which affects the snowfall direction, eye focus, e.t.c) and compose with other accessories(Hat🎩, Scarf🧣, e.t.c).
+[Snowman](https://snowman-eight.vercel.app/) is a composable NFT based on the ERC4883 standard which enables you to mint a snowman with dynamic attributes(sky color, wind direction which affects the snowfall direction, eye focus, e.t.c) and compose with other accessories(Hat🎩, Scarf🧣, e.t.c).
 
 ## How it works
 
