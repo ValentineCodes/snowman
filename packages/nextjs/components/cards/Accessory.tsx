@@ -44,35 +44,36 @@ const Accessory = ({id, contractName, name, description, image, remove}: Props) 
   const addToSnowman = async () => {
     if(isComposing || !isConnected || isLoadingAccessoryContract || isLoadingSnowmanContract || isLoadingSigner) return
 
-    try {
-      setIsComposing(true)
-      const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
+    setIsComposing(true)
+    const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
 
-      notification.loading(`Composing Snowman☃️ with ${name}`)
+    let notificationId = notification.loading(`Composing Snowman☃️ with ${name}`)
+    try { 
       const tx = await accessory["safeTransferFrom(address,address,uint256,bytes)"](connectedAccount, snowmanContract?.address, id, ethers.utils.defaultAbiCoder.encode(["uint256"], [(snowmanId || 0)]), {
         gasLimit: 500000
       })
       await tx.wait(1)
 
-      notification.loading(`Composed Snowman☃️ with ${name}`)
+      
+      notification.success(`Composed Snowman☃️ with ${name}`)
       onCloseAddToSnowman()
       remove()
     } catch(error) {
       console.log(error)
       notification.error(JSON.stringify(error))
     }
-
+    notification.remove(notificationId)
     setIsComposing(false)
   }
 
   const transfer = async () => {
     if(isTransferring || !isConnected || isLoadingAccessoryContract || isLoadingSigner) return
 
-    try {
-      setIsTransferring(true)
-      const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
+    setIsTransferring(true)
+    const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
 
-      notification.loading(`Transferring ${name}`)
+    let notificationId = notification.loading(`Transferring ${name}`)
+    try {
       const tx = await accessory["safeTransferFrom(address,address,uint256)"](connectedAccount, recipient, id, {
         gasLimit: 500000
       })
@@ -86,11 +87,12 @@ const Accessory = ({id, contractName, name, description, image, remove}: Props) 
       notification.error(JSON.stringify(error))
     }
 
+    notification.remove(notificationId)
     setIsTransferring(false)
   }
 
   return (
-    <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 p-2'>
+    <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 m-2 p-2'>
         <SVG src={image} />
         <div className='flex items-center justify-between gap-5 p-2 text-black'>
             <h1 className='font-bold text-lg'>{name}</h1>

@@ -96,55 +96,61 @@ const Snowman = ({id, remove}: Props) => {
 
   const removeAccessory = async (accessory: Accessory) => {
     if(isRemovingAccessory) return
-    try {
-      setIsRemovingAccessory(accessory.name)
-      const snowman = ISnowman.current.connect(signer)
 
-      notification.loading("Removing Accessory")
+    setIsRemovingAccessory(accessory.name)
+    const snowman = ISnowman.current.connect(signer)
+
+    let notificationId = notification.loading("Removing Accessory")
+    try {
       const tx = await snowman.removeAccessory(accessory.address, id, {
         gasLimit: 500000
       })
       await tx.wait(1)
 
+      
       notification.success(`Removed ${accessory.name} Accessory`)
-      setIsRemovingAccessory("")
       getDetails()
     } catch(error){
       notification.error(JSON.stringify(error))
-      setIsRemovingAccessory("")
     }
+
+    notification.remove(notificationId)
+    setIsRemovingAccessory("")
   }
 
   const removeAllAccessories = async () => {
     if(isRemovingAllAccessories) return
-    try {
-      setIsRemovingAllAccessories(true)
-      const snowman = ISnowman.current.connect(signer)
 
-      notification.loading("Removing All Accessories")
+    setIsRemovingAllAccessories(true)
+    const snowman = ISnowman.current.connect(signer)
+
+    let notificationId = notification.loading("Removing All Accessories")
+
+    try {
       const tx = await snowman.removeAllAccessories(id, {
         gasLimit: 500000
       })
       await tx.wait(1)
 
       notification.success("Removed All Accessories")
-      setIsRemovingAllAccessories(false)
       getDetails()
     } catch(error) {
       notification.error(JSON.stringify(error))
-      setIsRemovingAllAccessories(false)
     }
+
+    notification.remove(notificationId)
+    setIsRemovingAllAccessories(false)
   }
 
   const transfer = async () => {
     if(isTransferring || !isConnected) return
 
     setIsTransferring(true)
+    const snowman = ISnowman.current.connect(signer)
+
+    let notificationId = notification.loading(`Transferring Snowman#${id}`)
 
     try {
-      const snowman = ISnowman.current.connect(signer)
-
-      notification.loading(`Transferring Snowman#${id}`)
       const tx = await snowman["safeTransferFrom(address,address,uint256)"](connectedAccount, recipient, id, {
         gasLimit: 500000
       })
@@ -157,6 +163,7 @@ const Snowman = ({id, remove}: Props) => {
       notification.error(JSON.stringify(error))
     }
 
+    notification.remove(notificationId)
     setIsTransferring(false)
   }
 
@@ -164,7 +171,7 @@ const Snowman = ({id, remove}: Props) => {
   if(!metadata) return
 
   return (
-    <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 p-2'>
+    <div className='max-w-[20rem] rounded-lg bg-white border border-gray-300 m-2 p-2'>
         <SVG src={metadata.image} />
         <div className='flex items-center justify-between gap-5 p-2 text-black'>
             <h1 className='font-bold text-lg'>{metadata.name}</h1>

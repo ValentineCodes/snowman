@@ -24,9 +24,8 @@ const AccessoryUI = ({name, icon}: Props) => {
 
       const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
       setIsMinting(true)
+      let notificationId = notification.loading(`Minting One(1) ${name}`)
       try {
-
-        notification.loading(`Minting One(1) ${name}`)
         const tx = await accessory.mint({
           value: ethers.utils.parseEther("0.01"),
           gasLimit: ethers.BigNumber.from("500000"),
@@ -38,6 +37,7 @@ const AccessoryUI = ({name, icon}: Props) => {
       } catch(error) {
         notification.error(JSON.stringify(error))
       }
+      notification.remove(notificationId)
       setIsMinting(false)
     }
   
@@ -62,7 +62,7 @@ const AccessoryUI = ({name, icon}: Props) => {
         <p className="text-md md:text-xl -mt-2 text-center max-w-lg">Mint a unique {name}{icon} for 0.01 ETH and add to your Snowman☃️</p>
         <button className="border-orange-500 bg-orange-500 hover:border-black hover:bg-white hover:text-black transition-all px-4 py-2 text-white rounded-md shadow-lg" onClick={handleMint} disabled={isMinting}>{isMinting? <Spinner size="md" thickness='4px' speed='0.65s' />: "Mint One"}</button>
 
-        {!isLoading? (<AccessoryList name={name} icon={icon} balance={balance} />): <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />}
+        {!isLoading? (<AccessoryList name={name} icon={icon} balance={balance} />): !isConnected? <p>Connect Wallet</p> : <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />}
       </main>
     )
 }

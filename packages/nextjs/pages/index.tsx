@@ -15,7 +15,7 @@ import { notification } from "~~/utils/scaffold-eth";
 
 const Home: NextPage = () => {
   const [animatedText] = useTypewriter({
-    words: ['Snowman?☃️', 'Half-Assed Olaf?🫡'],
+    words: ['Snowman?☃️', 'Half-Assed Olaf?❄️'],
     loop: 0,
     delaySpeed: 2500
   })
@@ -34,10 +34,11 @@ const Home: NextPage = () => {
     if(isLoadingSnowmanContract || isLoadingSigner) return
 
     const snowman = new ethers.Contract(snowmanContract.address, snowmanContract.abi, signer)
-    try {
-      setIsMinting(true)
+    setIsMinting(true)
+      
+    let notificationId = notification.loading("Minting One(1) Snowman☃️")
 
-      notification.loading("Minting One(1) Snowman☃️")
+    try {
       const tx = await snowman.mint({
         value: ethers.utils.parseEther("0.02"),
         gasLimit: ethers.BigNumber.from("500000"),
@@ -46,11 +47,12 @@ const Home: NextPage = () => {
       
       notification.success("Minted One(1) Snowman☃️")
       setBalance(balance + 1)
-      setIsMinting(false)
     } catch(error) {
-      setIsMinting(false)
       notification.error(JSON.stringify(error))
     }
+
+    notification.remove(notificationId)
+    setIsMinting(false)
   }
   
   useEffect(() => {
@@ -79,7 +81,7 @@ const Home: NextPage = () => {
       <p className="text-md md:text-xl -mt-2 text-center max-w-lg">Mint a unique Snowman☃️ for 0.02 ETH and compose with a bunch of <Link href="/accessories" className="underline transition duration-300 text-orange-300 hover:text-orange-500 font-bold">accessories</Link>🎩🧣</p>
       <button className="border-orange-500 bg-orange-500 hover:border-black hover:bg-white hover:text-black transition-all px-4 py-2 text-white rounded-md shadow-lg" onClick={handleMint} disabled={isMinting}>{isMinting? <Spinner size="md" thickness='4px' speed='0.65s' />: "Mint One"}</button>
 
-      {!isLoading? (<SnowmanList balance={balance} />): <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />}
+      {!isLoading? (<SnowmanList balance={balance} />): !isConnected? <p>Connect Wallet</p> : <Spinner size="md" thickness='4px' speed='0.65s' className="mt-10" />}
 
     </main>
     </>

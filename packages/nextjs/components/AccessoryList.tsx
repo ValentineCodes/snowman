@@ -60,7 +60,7 @@ const AccessoryList = ({name, icon, balance}: Props) => {
     <section className='flex flex-col items-center'>
       <p className="text-xl text-center">You own <strong>{userBalance || "No"}</strong> {name}{icon}</p>
 
-      <div className="flex flex-wrap justify-center items-center gap-5 my-10">
+      <div className="flex flex-wrap justify-center items-center my-10">
         {renderAccessoryList()}
       </div>
     </section>

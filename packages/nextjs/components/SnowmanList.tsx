@@ -59,7 +59,7 @@ const SnowmanList = ({balance}: Props) => {
     <section className='flex flex-col items-center'>
       <p className="text-xl text-center">You own <strong>{userBalance || "No"}</strong> Snowman☃️</p>
 
-      <div className="flex flex-wrap justify-center items-center gap-5 my-10">
+      <div className="flex flex-wrap justify-center items-center my-10">
         {renderSnowmanList()}
       </div>
     </section>
