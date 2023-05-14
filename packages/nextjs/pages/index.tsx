@@ -37,12 +37,14 @@ const Home: NextPage = () => {
     try {
       setIsMinting(true)
 
+      notification.loading("Minting One(1) Snowman☃️")
       const tx = await snowman.mint({
         value: ethers.utils.parseEther("0.02"),
         gasLimit: ethers.BigNumber.from("500000"),
       })
       await tx.wait(1)
       
+      notification.success("Minted One(1) Snowman☃️")
       setBalance(balance + 1)
       setIsMinting(false)
     } catch(error) {

@@ -25,14 +25,16 @@ const AccessoryUI = ({name, icon}: Props) => {
       const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
       setIsMinting(true)
       try {
+
+        notification.loading(`Minting One(1) ${name}`)
         const tx = await accessory.mint({
           value: ethers.utils.parseEther("0.01"),
           gasLimit: ethers.BigNumber.from("500000"),
         })
         await tx.wait(1)
         
+        notification.success(`Minted One(1) ${name}`)
         setBalance(balance + 1)
-        
       } catch(error) {
         notification.error(JSON.stringify(error))
       }

@@ -20,7 +20,7 @@ import SVG from 'react-inlinesvg';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 import { ethers } from 'ethers';
 import { useAccount, useProvider, erc721ABI, useSigner } from 'wagmi';
-import { useScaffoldContractWrite, useDeployedContractInfo } from '~~/hooks/scaffold-eth';
+import { useDeployedContractInfo } from '~~/hooks/scaffold-eth';
 import { AddressInput } from '../scaffold-eth';
 import { notification } from '~~/utils/scaffold-eth';
 
@@ -84,7 +84,6 @@ const Snowman = ({id, remove}: Props) => {
       setAccessories(_accessories)
 
     } catch(error) {
-      console.log("Error getting details for Snowman ", id)
       console.error(error)
     } finally {
       setIsLoading(false)
@@ -95,30 +94,19 @@ const Snowman = ({id, remove}: Props) => {
     getDetails()
   }, [isLoadingSnowmanContract])
 
-  // const {writeAsync: transfer, isLoading: isTransferring, isSuccess: isTransferSuccessful} = useScaffoldContractWrite({
-  //   contractName: "Snowman",
-  //   functionName: "safeTransferFrom",
-  //   args: [connectedAccount, recipient, id],
-  //   overrides: {
-  //     gasLimit: ethers.BigNumber.from("500000"),
-  //   },
-  //   onSuccess: () => {
-  //     onCloseTransferModal()
-  //     remove()
-  //   }
-  // })
-
   const removeAccessory = async (accessory: Accessory) => {
     if(isRemovingAccessory) return
     try {
       setIsRemovingAccessory(accessory.name)
       const snowman = ISnowman.current.connect(signer)
 
+      notification.loading("Removing Accessory")
       const tx = await snowman.removeAccessory(accessory.address, id, {
         gasLimit: 500000
       })
       await tx.wait(1)
 
+      notification.success(`Removed ${accessory.name} Accessory`)
       setIsRemovingAccessory("")
       getDetails()
     } catch(error){
@@ -133,11 +121,13 @@ const Snowman = ({id, remove}: Props) => {
       setIsRemovingAllAccessories(true)
       const snowman = ISnowman.current.connect(signer)
 
+      notification.loading("Removing All Accessories")
       const tx = await snowman.removeAllAccessories(id, {
         gasLimit: 500000
       })
       await tx.wait(1)
 
+      notification.success("Removed All Accessories")
       setIsRemovingAllAccessories(false)
       getDetails()
     } catch(error) {
@@ -154,11 +144,13 @@ const Snowman = ({id, remove}: Props) => {
     try {
       const snowman = ISnowman.current.connect(signer)
 
+      notification.loading(`Transferring Snowman#${id}`)
       const tx = await snowman["safeTransferFrom(address,address,uint256)"](connectedAccount, recipient, id, {
         gasLimit: 500000
       })
       await tx.wait(1)
 
+      notification.success(`Transferred Snowman#${id}☃️`)
       onCloseTransferModal()
       remove()
     } catch(error) {

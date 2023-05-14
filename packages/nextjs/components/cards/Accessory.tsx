@@ -48,11 +48,13 @@ const Accessory = ({id, contractName, name, description, image, remove}: Props) 
       setIsComposing(true)
       const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
 
+      notification.loading(`Composing Snowman☃️ with ${name}`)
       const tx = await accessory["safeTransferFrom(address,address,uint256,bytes)"](connectedAccount, snowmanContract?.address, id, ethers.utils.defaultAbiCoder.encode(["uint256"], [(snowmanId || 0)]), {
         gasLimit: 500000
       })
       await tx.wait(1)
 
+      notification.loading(`Composed Snowman☃️ with ${name}`)
       onCloseAddToSnowman()
       remove()
     } catch(error) {
@@ -70,11 +72,13 @@ const Accessory = ({id, contractName, name, description, image, remove}: Props) 
       setIsTransferring(true)
       const accessory = new ethers.Contract(accessoryContract.address, accessoryContract.abi, signer)
 
+      notification.loading(`Transferring ${name}`)
       const tx = await accessory["safeTransferFrom(address,address,uint256)"](connectedAccount, recipient, id, {
         gasLimit: 500000
       })
       await tx.wait(1)
 
+      notification.success(`Transferred ${name}`)
       onCloseTransferModal()
       remove()
     } catch(error) {
