@@ -118,6 +118,7 @@ const Snowman = ({id, remove}: Props) => {
   })
 
   const removeAccessory = async (accessory: Accessory) => {
+    if(isRemovingAccessory) return
     try {
       setIsRemovingAccessory(accessory.name)
       const snowman = ISnowman.current.connect(signer)
@@ -126,10 +127,10 @@ const Snowman = ({id, remove}: Props) => {
       })
       getDetails()
     } catch(error){
-      console.log("Error removing ", accessory.address)
+      console.log("Error removing ", accessory.name)
       console.error(error)
     } finally {
-      setIsRemovingAccessory(accessory.name)
+      setIsRemovingAccessory("")
     }
   }
 
@@ -156,12 +157,12 @@ const Snowman = ({id, remove}: Props) => {
                       <MenuItem> Remove Accessory</MenuItem>
                       </MenuButton>
                       <MenuList>
-                        {accessories.filter(accessory => accessory.isWorn).map(accessory => <MenuItem onClick={() => removeAccessory(accessory)}>{accessory.name}</MenuItem>)}
+                        {accessories.filter(accessory => accessory.isWorn).map(accessory => <MenuItem onClick={() => removeAccessory(accessory)}>{accessory.name}{isRemovingAccessory === accessory.name && <Spinner size="sm" thickness='4px' speed='0.65s' className="ml-2" />}</MenuItem>)}
                       </MenuList>
                     </Menu>
                     
                     <MenuItem onClick={removeAllAccessories}>
-                      Remove All Accessories
+                      Remove All Accessories {isRemovingAllAccessories && <Spinner size="sm" thickness='4px' speed='0.65s' className="ml-2" />}
                     </MenuItem>
                   </>
                 )}
