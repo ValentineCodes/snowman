@@ -80,7 +80,7 @@ export const Header = () => {
         </div>
         <Link href="/" passHref className="hidden lg:flex items-center gap-2 ml-4 mr-6">
           <div className="flex relative w-10 h-10">
-            <Image alt="Snowman" className="cursor-pointer" fill src={require("../../../snowman.svg")} />
+            <Image src="/logo.svg" alt="Snowman" className="cursor-pointer" fill />
           </div>
           <div className="flex flex-col">
             <span className="font-bold leading-tight">Snowman</span>
