@@ -4,6 +4,7 @@
   "scripts": {
     "account": "hardhat run scripts/listAccount.ts",
     "chain": "hardhat node --network hardhat",
+    "clean": "hardhat clean",
     "compile": "hardhat compile",
     "deploy": "hardhat deploy --export-all ./temp/hardhat_contracts.json \"$@\" && hardhat run scripts/generateTsAbis.ts",
     "deploy:sepolia": "hardhat deploy --network sepolia --export-all ./temp/hardhat_contracts.json \"$@\" && hardhat run scripts/generateTsAbis.ts",

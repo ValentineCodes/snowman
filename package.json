@@ -20,6 +20,7 @@
     "generate": "yarn workspace @snowman/hardhat generate",
     "hardhat:lint": "yarn workspace @snowman/hardhat lint",
     "hardhat:lint-staged": "yarn workspace @snowman/hardhat lint-staged",
+    "clean": "yarn workspace @snowman/hardhat clean",
     "test": "yarn workspace @snowman/hardhat test",
     "start": "yarn workspace @snowman/nextjs dev",
     "next:build": "yarn workspace @snowman/nextjs build",
