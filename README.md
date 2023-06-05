@@ -6,6 +6,8 @@
 
 [Snowman](https://snowman-eight.vercel.app/) is a composable NFT based on the ERC4883 standard which enables you to mint a snowman with dynamic attributes(sky color, wind direction which affects the snowfall direction, eye focus, e.t.c) and compose with other accessories(Hat🎩, Scarf🧣, e.t.c).
 
+[Video Demo](https://youtu.be/Wtu5ufGTK4o)
+
 ## How it works
 
 A user can mint a Snowman for 0.02 ETH. Then mint other accessories(NFTs). If the accessory has been allowed by the Snowman contract owner to be used for composition, the accessory can be transferred using `safeTransferFrom` to the Snowman NFT contract which triggers the `onERC721Received` function which then adds the accessory to the accessory owner's Snowman specified in the `bytes` param of the `safeTransferFrom` function. The `tokenURI` and the `renderTokenById` functions will then return the Snowman with it's accessories. Accessories can be removed by users at any time using the `removeAccessory` or `removeAllAccessories` functions.
